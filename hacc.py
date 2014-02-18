@@ -12,7 +12,6 @@ def haccredshiftsforstep(stepnumber ,
 	zfinal  = 0. ,
 	numsteps = 500) :
 
-	print type(zin) , type(zfinal) , type(numsteps)
 	ain  =  1.0/(1.0 + zin) 
 	afinal  =  1.0/(1.0 + zfinal) 
 	astep =  (afinal - ain)/numsteps 
@@ -74,7 +73,7 @@ def particlemass(
 	#actual rhocrit0 = rhocrit0 * h^2
 	rhocrit0 = critdensity(h = 1., unittype = 'solarmassperMpc3') 
 	#units of solar masses/ Mpc^3  / h^2
-	print "RHOCRIT", rhocrit0
+	#print "RHOCRIT", rhocrit0
 	rho = Omega * rhocrit0 
 
 	numparticles = numparticlescuberoot**3.0 
@@ -129,7 +128,12 @@ def _hacccosmo(inputfile ) :
 		Omega_b = hacc['DEUT']/h/h 
 		Omega_m = Omega_CDM + Omega_b + Omega_nu
 
-		return (H0 , Omega_m , Omega_nu, Omega_b ) #check 
+		w0 = hacc['W_DE']
+		wa = hacc['WA_DE']
+		sigma8  = hacc['SS8']
+		ns = hacc['NS']
+
+		return (H0 , Omega_m , Omega_nu, Omega_b , w0, wa , sigma8, ns) #check 
 		
 
 
@@ -148,14 +152,14 @@ class haccsim (object ) :
 			self.name = name 
 		haccdict = io.builddict(indatfile , dictdelim = " " )
 
-
 		#set cosmo:
 		from interfaces import FCPL 
-		H0 , Omega_m , Omega_nu , Omega_b  =  _hacccosmo(indatfile) 
+		H0 , Omega_m , Omega_nu , Omega_b, w0, wa, sigma8  , ns =  _hacccosmo(indatfile) 
 		sigma_mnu = Omega_nu*94.0 
+		
 		self.cosmo = FCPL ( H0 = H0 , Om0 = Omega_m , Ob0 = Omega_b , 
-			sigmamnu = sigma_mnu , w0 = haccdict["W_DE"], 
-			wa = haccdict["WA_DE"])
+			sigmamnu = sigma_mnu , w0 = w0, wa = wa, 
+			sigma8 = sigma8  , ns = ns)
 
 
 		#set sim properties
@@ -197,9 +201,9 @@ class haccsim (object ) :
 	def steptoredshift(self , step ) :
 
 		zin =  self.initialredshift  
-		print zin
+		#print zin
 		zf  =  self.finalredshift 
-		print zf
+		#print zf
 		numsteps = self.numtimesteps 
 
 		return  haccredshiftsforstep(step ,
