@@ -167,10 +167,10 @@ class haccsim (object ) :
 
 			#set massresolution
 		Omegacb0 = self.cosmo.Ob0 + self.cosmo.Oc0
-		self._length = haccsimdict ['RL']
+		self._boxsize = haccsimdict ['RL']
 		self._numparticlescuberoot = haccsimdict['NP']
 		self._particlemass = particlemass(Omega = Omegacb0 , 
-			lengthcuberoot = self._length,
+			lengthcuberoot = self._boxsize,
 			numparticlescuberoot = self._numparticlescuberoot ,
 			h = self.cosmo.h ) 
 
@@ -189,8 +189,12 @@ class haccsim (object ) :
 		return self._particlemass 
 
 	@property 
+	def boxsize (self) :
+		return self._boxsize 
+
+	@property 
 	def simvolume (self) :
-		l =  self._length
+		l =  self._boxsize
 		return l*l*l
 
 	@property 

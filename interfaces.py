@@ -86,26 +86,26 @@ class FCPL (w0waCDM) :
 
 
 
-	def setfromHACCinput(self, inputfile ) :
-		from utils import ioutils as io
-
-		haccdict   = io.builddict(inputfile , dictdelim = " " )
-
-		hacc = _hacccosmologydict (haccdict)
-
-		h = hacc['HUBBLE']
-		H0 = 100.0*h
-		Omega_CDM= hacc['OMEGA_CDM']
-		Omega_nu = hacc['OMEGA_NU']
-		#print h
-		Omega_b = hacc['DEUT']/h/h 
-		Omega_m = Omega_CDM + Omega_b + Omega_nu
-		self._Om0 =  Omega_m 
-		self._Ob0 = Omega_b
-		
-		self._H0 = H0
-
-		return 0
+#	def setfromHACCinput(self, inputfile ) :
+#		from utils import ioutils as io
+#
+#		haccdict   = io.builddict(inputfile , dictdelim = " " )
+#
+#		hacc = _hacccosmologydict (haccdict)
+#
+#		h = hacc['HUBBLE']
+#		H0 = 100.0*h
+#		Omega_CDM= hacc['OMEGA_CDM']
+#		Omega_nu = hacc['OMEGA_NU']
+#		#print h
+#		Omega_b = hacc['DEUT']/h/h 
+#		Omega_m = Omega_CDM + Omega_b + Omega_nu
+#		self._Om0 =  Omega_m 
+#		self._Ob0 = Omega_b
+#		
+#		self._H0 = H0
+#
+#		return 0
 		
 if __name__=="__main__":
 
