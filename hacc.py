@@ -3,6 +3,8 @@
 #cosmoutils 
 #
 from utils import ioutils as io
+import numpy as np
+import matplotlib.pyplot as plt
 
 #example input file for HACC
 haccindat      =  "example_data/indat.params"
@@ -230,10 +232,10 @@ class haccsim (object ) :
 		s  = "SUMMARY OF simulation, name = "+ self.name  
 		s += "\n\n========================================\n\n"
 		s += "Cosmology\n====================\n" 
-		
+		s += "massive neutrino energy density " + str(self.cosmo.sigmamnu)
 		s += "Simulation Properties\n=====================\n\n"
 
-		s += "Simulation Volume ("+ "{:.2e}".format(self._length) +r'$)^3 h^{-3} Mpc^3$'+" \n"  
+		s += "Simulation Volume ("+ "{:.2e}".format(self._boxsize) +r'$)^3 h^{-3} Mpc^3$'+" \n"  
 		s += "Particle Mass = "+ "{:.2e}".format(self.particlemass)+"r'$h^{-1} M_\odot'$\n" 
 		if logfilename != None:
 
@@ -258,6 +260,13 @@ def tests() :
 	print hacc.steptoredshift ( 161) 
 
 	print hacc.summary()
+
+	print hacc.cosmo.growth(1.0)
+	z  = hacc.steptoredshift ( np.arange(1,500,1))
+	plt.plot ( 1.0/(1.0 + z) , hacc.cosmo.growth(z)[0] , 'r')
+	plt.plot ( 1.0/(1.0 + z) ,1.0/(1.0 + z) , ls = 'dashed')
+	plt.xlim(0.5,1.0)
+	plt.show()
 
 
 if __name__=="__main__":

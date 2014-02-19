@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import numpy as np
+import matplotlib.pyplot as plt
 from astropy.cosmology  import w0waCDM 
 
 def _hacccosmologydict(haccinputdict ) :
@@ -28,7 +30,6 @@ class FCPL (w0waCDM) :
 		setvaluesfrom = None , 
 		name='FCPL'):
 		
-		#print "wa ", wa
 		w0waCDM.__init__(self, 
 			H0 = H0, 
 			Om0 = Om0, 
@@ -40,15 +41,11 @@ class FCPL (w0waCDM) :
 			name = name) 
 
 		self._H0 = float(H0)
-		#self._Oc0   = float (Oc0)
 		self._Ob0   = float (Ob0)
 		self._sigmamnu  = float(sigmamnu)
 		self._As    = As
 		self._sigma8 = sigma8 
 		self._ns    = float(ns)
-		#print self.Tcmb0 
-		#print self.w0
-		#self._w0 = w0
 
 	@property 
 	def Ob0(self):
@@ -58,59 +55,62 @@ class FCPL (w0waCDM) :
 	def sigmamnu(self) :
 		return self._sigmamnu 
 
-	@property 
-	def As(self):
-		return self._As
-
-	@property 
-	def ns(self):	
-		return self._ns 
-
-	@property
-	def sigma8 (self) :
-		return self._sigma8
 
 	@property
 	def On0 (self) :
 			#For now 
 		On0 = self._sigmamnu / 94.0
+		return On0
 	@property
 	def Oc0 (self) :
 		#print type(self.Om0), self._Ob0 , self._sigmamnu /94.0
 		Oc0 = self.Om0 - self._Ob0 - self._sigmamnu/94.0 
 		return Oc0
 
-	#@property 
-	#def w0 (self) :
-	#	return self._w0
+
+	@property 
+	def As(self):
+		return self._As
+
+	@property
+	def sigma8 (self) :
+		return self._sigma8
+
+	@property 
+	def ns(self):	
+		return self._ns 
+
+	#new methods:
+
+	def growth(self, z ):
+		""" 
+		returns D0, and D1 for an array-like redshift for the 
+		cosmology 
+
+		"""
+		import growthfunction as gf
+
+		h = self.h
+		omegacb = self.Ob0 + self.Oc0 
+		#print "line 93", type(self.On0), type(h)
+		omeganuh2 = self.On0 * h * h 
+		avals, D, info  = gf.growth(Omegam = omegacb ,
+			w0 = self.w0 , wa = self.wa , Tcmb = self.Tcmb0 , 
+			h = self.h , Neff = self.Neff , 
+			omeganuh2val =  omeganuh2 )
 
 
+		D , logD = gf.interp_D( z, avals, D[:,0], D[:,1])
 
-#	def setfromHACCinput(self, inputfile ) :
-#		from utils import ioutils as io
-#
-#		haccdict   = io.builddict(inputfile , dictdelim = " " )
-#
-#		hacc = _hacccosmologydict (haccdict)
-#
-#		h = hacc['HUBBLE']
-#		H0 = 100.0*h
-#		Omega_CDM= hacc['OMEGA_CDM']
-#		Omega_nu = hacc['OMEGA_NU']
-#		#print h
-#		Omega_b = hacc['DEUT']/h/h 
-#		Omega_m = Omega_CDM + Omega_b + Omega_nu
-#		self._Om0 =  Omega_m 
-#		self._Ob0 = Omega_b
-#		
-#		self._H0 = H0
-#
-#		return 0
+		return D, logD 
 		
 if __name__=="__main__":
 
-	f = FCPL ( H0 = 65, Om0 = 0.3 , w0 = -1.5, wa =0.) 
+	f = FCPL ( H0 = 65, Om0 = 0.99 , w0 = -1.0, wa =0.) 
+	g = FCPL ( H0 = 65, Om0 = 0.8 , w0 = -1.0, wa =0.) 
+	r = FCPL ( H0 = 65, Om0 = 0.3 , w0 = -1.0, wa =0.) 
 	#f.setfromHACCinput("example_data/indat.params")
+	print "results \n"
 	print f.sigmamnu 
 	print f.As
 	print f.sigma8
@@ -122,4 +122,12 @@ if __name__=="__main__":
 	print "get TCMB ", f.Tcmb0
 	#import inspect
 	#print inspect.getmembers(f)
-		
+	z   = np.arange(0.,5., 0.1)
+	plt.plot ( 1.0/(1.0 + z) , f.growth(z)[0] , 'r', label = "Om0 = 0.99")
+	plt.plot ( 1.0/(1.0 + z) , g.growth(z)[0] , 'k', label = "Om0 = 0.8")
+	plt.plot ( 1.0/(1.0 + z) , r.growth(z)[0] , 'b', label = "Om0 = 0.3")
+	plt.plot ( 1.0/(1.0 + z) ,1.0/(1.0 + z) , ls = 'dashed')
+	#plt.xlim(0.5,1.0)
+	plt.legend(loc ="best")
+	plt.show()
+
