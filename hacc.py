@@ -168,9 +168,10 @@ class haccsim (object ) :
 			#set massresolution
 		Omegacb0 = self.cosmo.Ob0 + self.cosmo.Oc0
 		self._length = haccsimdict ['RL']
+		self._numparticlescuberoot = haccsimdict['NP']
 		self._particlemass = particlemass(Omega = Omegacb0 , 
 			lengthcuberoot = self._length,
-			numparticlescuberoot = haccsimdict['NP'],
+			numparticlescuberoot = self._numparticlescuberoot ,
 			h = self.cosmo.h ) 
 
 			#set time stepping info
@@ -178,20 +179,28 @@ class haccsim (object ) :
 		self._zf  = haccsimdict["Z_FIN"]
 		self._numtimesteps = haccsimdict["N_STEPS"]
 
+	@property 
+	def numparticles (self) :
+		npcuberoot = self._numparticlescuberoot 
+		return npcuberoot * npcuberoot * npcuberoot 
+		
 	@property
 	def particlemass (self) :
 		return self._particlemass 
+
 	@property 
 	def simvolume (self) :
-
 		l =  self._length
 		return l*l*l
+
 	@property 
 	def initialredshift (self ) :
 		return self._zin 
+
 	@property 
 	def numtimesteps (self ) :
 		return self._numtimesteps 
+
 	@property 
 	def finalredshift (self ) :
 		return self._zf 
