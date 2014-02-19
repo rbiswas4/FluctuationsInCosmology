@@ -5,6 +5,7 @@
 from utils import ioutils as io
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
 
 #example input file for HACC
 haccindat      =  "example_data/indat.params"
@@ -120,6 +121,9 @@ def _hacccosmo(inputfile ) :
 
 		haccdict   = io.builddict(inputfile , dictdelim = " " )
 
+		#print haccdict
+		#print haccdict['OMEGA_NU']
+		#sys.exit()
 		hacc = hacccosmologydict (haccdict)
 
 		h = hacc['HUBBLE']
@@ -158,6 +162,8 @@ class haccsim (object ) :
 		from interfaces import FCPL 
 		H0 , Omega_m , Omega_nu , Omega_b, w0, wa, sigma8  , ns =  _hacccosmo(indatfile) 
 		sigma_mnu = Omega_nu*94.0 
+		#print sigma_mnu 
+		#sys.exit()
 		
 		self.cosmo = FCPL ( H0 = H0 , Om0 = Omega_m , Ob0 = Omega_b , 
 			sigmamnu = sigma_mnu , w0 = w0, wa = wa, 
@@ -232,7 +238,8 @@ class haccsim (object ) :
 		s  = "SUMMARY OF simulation, name = "+ self.name  
 		s += "\n\n========================================\n\n"
 		s += "Cosmology\n====================\n" 
-		s += "massive neutrino energy density " + str(self.cosmo.sigmamnu)
+		s += "massive neutrino energy density " + str(self.cosmo.sigmamnu/94.0) + "\n"
+		s += "massive neutrino energy density " + str(self.cosmo.On0) + "\n"
 		s += "Simulation Properties\n=====================\n\n"
 
 		s += "Simulation Volume ("+ "{:.2e}".format(self._boxsize) +r'$)^3 h^{-3} Mpc^3$'+" \n"  
@@ -248,9 +255,17 @@ class haccsim (object ) :
 
 def tests() :
 
-	print hacccosmologydict(haccindat)
-	hacc = haccsim ( "example_data/indat.params", name = "M000")
+	if len(sys.argv) <2:
+		haccindat = "example_data/indat.params"
+		#"/media/star1/simulations/Neutrinos/M000n1/output"
+	else:
+		haccindat = sys.argv[1]
+		
+	hacc = haccsim ( haccindat, name = "M000")
 
+	print hacc.summary()
+	#print hacccosmologydict(haccindat)
+	sys.exit()
 	print hacc.cosmo.Om0
 	print "particle mass in sim is ", hacc.particlemass
 	print "mass res in sim is ", "{:.2e}".format(hacc.particlemass )
@@ -259,7 +274,6 @@ def tests() :
 	#print hacc.steptoredshift ( 499) 
 	print hacc.steptoredshift ( 161) 
 
-	print hacc.summary()
 
 	print hacc.cosmo.growth(1.0)
 	z  = hacc.steptoredshift ( np.arange(1,500,1))
