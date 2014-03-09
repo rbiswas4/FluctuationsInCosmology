@@ -27,6 +27,8 @@ class FCPL (w0waCDM) :
 		sigmamnu = 0.0  ,
 		Tcmb0=2.725,
                 Neff=3.04, 
+		TFfilelist  = [] , 
+		TFredshiftlist = [],
 		setvaluesfrom = None , 
 		name='FCPL'):
 		
@@ -47,6 +49,33 @@ class FCPL (w0waCDM) :
 		self._sigma8 = sigma8 
 		self._ns    = float(ns)
 
+		self._providedtransferfiles = {}
+		self._transferredshifts  = None
+		if len(TFfilelist ) != len(TFredshiftlist) :
+			print "number of files in list must equal number of redshifts in list\n"
+			raise  
+		if len(TFredshiftlist) > 0:
+			for i, z in enumerate(TFredshiftlist) :
+				self._providedtransferfiles[z] = TFfilelist[i] 
+			self._transferredshifts = sorted (self._providedtransferfiles)
+			
+
+	@property 
+	def transferredshifts( self ):
+		return self._transferredshifts
+		
+	@property 
+	def transferfilesforredshift(self ) :
+		return self._providedtransferfiles 
+	@property 
+	def transferfile ( self , z ) :
+		if redshift in transferredshifts :
+			return self.transferfilesforredshift( z )  
+
+		else :
+			return None
+
+			
 	@property 
 	def Ob0(self):
 		return self._Ob0 
@@ -80,13 +109,21 @@ class FCPL (w0waCDM) :
 	def ns(self):	
 		return self._ns 
 
+
+
 	#new methods:
 
 	def growth(self, z ):
 		""" 
-		returns D0, and D1 for an array-like redshift for the 
-		cosmology 
+		returns the linear growth function D0, and the derivative D1 
+		of the linear growth function with respect to the scale factor 
+		(CHECK) for the cosmology at redshift z
 
+		args:
+			z: array-like, make sure they are floats not ints
+		returns:
+			tuple of D0, and D1 values at the requested redshifts
+			
 		"""
 		import growthfunction as gf
 
@@ -103,12 +140,14 @@ class FCPL (w0waCDM) :
 		D , logD = gf.interp_D( z, avals, D[:,0], D[:,1])
 
 		return D, logD 
+
 		
 if __name__=="__main__":
 
 	f = FCPL ( H0 = 65, Om0 = 0.99 , w0 = -1.0, wa =0.) 
 	g = FCPL ( H0 = 65, Om0 = 0.8 , w0 = -1.0, wa =0.) 
 	r = FCPL ( H0 = 65, Om0 = 0.3 , w0 = -1.0, wa =0.) 
+	f = FCPL ( H0 = 65, Om0 = 0.99 , w0 = -1.0, wa =0., TFfilelist = ["example_data/cmbM000.tf"], TFredshiftlist = [0.0]) 
 	#f.setfromHACCinput("example_data/indat.params")
 	print "results \n"
 	print f.sigmamnu 
@@ -120,6 +159,8 @@ if __name__=="__main__":
 	print "get baryon ", f.Ob0
 	print "get w0", f.w0
 	print "get TCMB ", f.Tcmb0
+	print "transfer function file name ", f.transferfilesforredshift[0.0]
+	#print "transfer function file name ", f.transferfilesforredshift[0.4]
 	#import inspect
 	#print inspect.getmembers(f)
 	z   = np.arange(0.,5., 0.1)

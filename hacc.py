@@ -1,4 +1,4 @@
-#!/usr/bin/emb python
+#!/usr/bin/env python
 #Requirements:
 #cosmoutils 
 #

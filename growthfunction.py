@@ -272,6 +272,6 @@ if __name__=="__main__":
 	#avals, Dn , infon  = growth(Omegam =0.25, w0 =- 1.0, wa =0.0, Tcmb =2.725, h =0.71, Neff  = 3.04, omeganuh2val = 0.0) 
 	#avals, D , info  = growth(Omegam =0.3, w0 =- 1.00, wa =0.00, Tcmb =0, h =0.71, Neff  = 0.00, ) 
 	zseek= 1.0
-	zseek = np.arange(0.0, 1.0, 0.1)
+	zseek = np.arange(0.0, 2.0, 0.1)
         Dseek, logDseek=interp_D(zseek, avals, D[:,0],D[:,1])
         print np.array([zseek, Dseek, logDseek]).T
