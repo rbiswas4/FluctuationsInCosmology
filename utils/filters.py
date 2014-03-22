@@ -3,6 +3,7 @@
 
 
 import numpy as np
+import typeutils as tu
 
 def Wtophatkspace(kR, R = None ) :
 	"""Returns the Fourier Transform of the real space top hat window 
@@ -36,8 +37,16 @@ def dWtophatkspacedR ( kR  ,R ) :
 		array like derivative of Wtophatkspace with respect to R
 
 	"""
+	filt = 3.0 *(  np.sin(kR) / kR  - Wtophatkspace (kR )) 
+	if tu.isiterable(R):
+		x = filt.transpose()/R
+		#returns an array whose elesements are k values for each R
+		return x.transpose()
 
-	return  3.0 *(  np.sin(kR) / kR  - Wtophatkspace (kR )) /R 
+		
+	else:
+
+		return  filt /R 
 
 def dWtophatkspacesqdR( kR , R ) :
 
