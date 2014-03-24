@@ -14,6 +14,7 @@
 # function calculation.
 #R. Biswas, Thu Nov 14 17:59:14 CST 2013
 
+import matplotlib.pyplot as plt
 import typeutils as tu
 import massfunctions as mf
 import numpy as np
@@ -309,7 +310,7 @@ def sigma(ps ,  R = 8 ,  khmin = 1e-5, khmax = 2.0, logkhint = 0.005, cosmo = No
 		logkhint = logkhint , cosmo=cosmo , filt = filt , **params )
 
 	return np.sqrt(sigsq )
-def sigmasq (ps , R = 8. , khmin = 1.0e-5 , khmax = 2.0, logkhint = 0.005 , 
+def sigmasq (ps , R = 8. , usenative = True, khmin = 0.9e-5 , khmax = 5.0, logkhint = 0.005 , 
 	cosmo = None, filt= filters.Wtophatkspacesq,  **params) : 
 	"""
 	Returns the variance of the overdensity field smoothed at 
@@ -317,25 +318,52 @@ def sigmasq (ps , R = 8. , khmin = 1.0e-5 , khmax = 2.0, logkhint = 0.005 ,
 
 	args:
 		ps: tuple of koverh, power spectrum values
-
+		R : float array like
+			distance scale in units of Mpc/h over which 
+			the filtering is done
+		usenative: bool, optional , defaults to True
+			Use values provided in ps, rather than 
+			interpolation
+		cosmo: Model, whose hubble constant will be used
+		
+	returns :
+		array of sigmasq values 
 
 	notes:
-		We need h, even if CAMB power spectrum is given
+		- We need h, even if CAMB power spectrum is given
+		- If interpolation is used only, and the range provided
+			is outside the range of the data, only those points
+			in the original range will be used. extrapolation
+			is dangerous, particularly at high k, unless it is 
+			made to drop as a power law. 
+
 	"""
 
 	import numpy as np
 	import scipy.integrate as si
 
-	logkhmin  = np.log(khmin)
-	logkhmax  = np.log(khmax)
-	logkh = np.arange(logkhmin, logkhmax , logkhint) 
 
 	h = cosmo.H0/100.0
-	khvals = np.exp(logkh)
+	if usenative :
+		khvals = ps[0]
+	else: 
+		logkhmin  = np.log(khmin)
+		logkhmax  = np.log(khmax)
+		logkh = np.arange(logkhmin, logkhmax , logkhint) 
+		khvals = np.exp(logkh)
+
+		logkhmin = max(min(ps[0]),logkhmin)
+		logkhmax = min(max(ps[0]),logkhmax) 
+
 	k  = khvals * h  
 	
 
 	psinterp = np.interp (khvals , ps[0], ps[1])
+
+	#plt.loglog(khvals, psinterp, label="interp")
+	#plt.loglog(ps[0], ps[1], label="native")
+	#plt.legend(loc= "best")
+	#plt.show()
 
 	if tu.isiterable(R):
 		R = np.asarray(R)
@@ -349,7 +377,7 @@ def sigmasq (ps , R = 8. , khmin = 1.0e-5 , khmax = 2.0, logkhint = 0.005 ,
 	ksqWsqPk = k*k *kwinsq* psinterp /2. /np.pi/ np.pi/h /h/h	
 	
 	
-	sigmasq = si.simps ( ksqWsqPk, x = k) 
+	sigmasq = si.simps ( ksqWsqPk, x = k, even = 'avg') 
 	return sigmasq	
 
 
@@ -445,17 +473,12 @@ def dlnsigmadlnM (M ,
 
 	dlnRdlnM = 1.0/3.0
 	RinMpcoverh = R*h 
-	#if tu.isiterable(R):
-	#	R = np.asarray(R)
-	#	kr = np.outer( R, khvals ) 
-	#else:
-	#	kr  = R* khvals 
-
-	#sigmasq (ps , R = RinMpcoverh, khmin = khmin , khmax = khmax,  
-	#logkhint = logkhint , 
-	#cosmo = cosmo, filt= filters.Wtophatkspacesq,  **params) 
-	dlnsigdlnR =  RinMpcoverh *sigmasq (R = RinMpcoverh , ps  = ps, z = z ,  
-		bgtype = bgtype,  filt = filters.dWtophatkspacesqdR, cosmo = cosmo ,  khmin  = khmin , 
+	
+	#d ln sigma /d ln R = d ln sigma^2 / d ln R / sigma^2/ 2.0  
+		#sigmasq with filter of dWtophatkspacesqdlnR  
+		# is dln sigma^2/ d ln R 
+	dlnsigdlnR =  sigmasq (R = RinMpcoverh , ps  = ps, z = z ,  
+		bgtype = bgtype,  filt = filters.dWtophatkspacesqdlnR, cosmo = cosmo ,  khmin  = khmin , 
 		khmax  = khmax , logkhint = logkhint,  **params )/sig/ sig/2.0 
 
 	#return sig
@@ -474,6 +497,7 @@ def dndlnM ( M ,
 	deltac = 1.674 , 
 	**params ):
 	"""
+	returns the mass function dn/dln(M) in units of h^3 Mpc^{-3}  
 	args:
 		M: mandatory, arraylike 
 			mass bin in units of solar Mass
@@ -490,10 +514,9 @@ def dndlnM ( M ,
 		added argument deltac with default value 1.674 
 	"""
 
-
 	h = cosmo.H0/100.0
-	rhocr = critdensity( h = h , 
-		unittype = "solarmassperMpc3") 
+	#rhocr = critdensity( h = h , 
+	#	unittype = "solarmassperMpc3") 
 
 	sig = sigmaM (M ,  
 		ps , 
@@ -504,6 +527,7 @@ def dndlnM ( M ,
 		z = z,
 		cosmo = cosmo ,
 		**params)
+
 	dlsinvdlM =  -dlnsigmadlnM (M ,
 		ps ,
 		z = z , 
@@ -514,11 +538,10 @@ def dndlnM ( M ,
 		logkhint = logkhint , 
 		**params ) 
 
-
 	f_sigma = mf.__fsigmaBhattacharya (
 		 sigma = sig,
 		 deltac = deltac ,
-		 z = 0.0 ,
+		 z = z ,
 		 A0 = 0.333 ,
 		 a0 = 0.788 ,
 		 p0 = 0.807 ,
@@ -530,12 +553,13 @@ def dndlnM ( M ,
 		 Mlow = 6e11 ,
 		 Mhigh = 3e15)    
 
-
-
-	rhobg = __rhobg( z =z , bgtype = "matter", 
+	rhobg = __rhobg( z =z , bgtype = bgtype, 
 		unittype = "solarmassperMpc3",  cosmo = cosmo)
-	dndlnM = rhobg *f_sigma *dlsinvdlM  / M
+	 
+	dndlnM = rhobg *f_sigma *dlsinvdlM /M 
 
+	#dndlnM = dlsinvdlM  *f_sigma/M * rhobg
+		#critdensity(h = cosmo.h, unittype = "solarmassperMpc3")*cosmo.Om0 
 	return dndlnM   
 if __name__=="__main__":
 
