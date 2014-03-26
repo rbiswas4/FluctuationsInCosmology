@@ -14,6 +14,7 @@
 # function calculation.
 #R. Biswas, Thu Nov 14 17:59:14 CST 2013
 
+import sys
 import matplotlib.pyplot as plt
 import typeutils as tu
 import massfunctions as mf
@@ -67,7 +68,6 @@ def critdensity(h = 1.0,
 
 	from astropy import units as u
 	from astropy import constants as ct 
-	import numpy as np
 
 
 	kmperMpc = (u.km / u.Mpc).decompose().scale 
@@ -161,7 +161,6 @@ def filterradiusformass( M ,
 	returns :
 		Radius in Mpc
 	"""
-	import numpy as np
 
 	#if cosmo == None:
 	#	from astropy.cosmology import Planck13 as cosmo
@@ -249,7 +248,9 @@ def powerspectrumfromfile(fname,
 def powerspectrum ( koverh , 
 	asciifile = None ,
 	pstype = "matter", 
-	method = "CAMBoutfile"):
+	method = "CAMBoutfile",
+	cosmo =  None ,
+	**params):
 
 	"""
 	returns linearly interpolated values of the powerspectrum in the 
@@ -269,17 +270,76 @@ def powerspectrum ( koverh ,
 		methods with code being added
 	"""
 
-	import numpy as np
+	#ensure we are supposed to read CAMB outfiles
+	if method != "CAMBoutfile" :
+		raise ValueError("Method not defined")
 
-	pk = cio.loadpowerspectrum(asciifile)
+	# Decide whether this ia a matter or transfer file
+	psfile = False
+	tkfile = False
+	Unknown = True
 
-	if not np.all(np.diff(pk[:,0])>0.):
-		raise ValueError("The k values in the power spectrum file are not in ascending order")
+	tmpfile = np.loadtxt(asciifile)
+	shapetuple = np.shape(tmpfile)
+	if shapetuple[-1] == 7:
+		tkfile  = True
+		Unknown = False 
+	if shapetuple[-1] ==2 :
+		psfile  = True 	
+		Unknown  = False
+	if koverh == None:
+		koverh = tmpfile[:,0]
 
-	if koverh == None :
-		return (pk[:,0], pk[:,1])
+	if Unknown:
+		#file is not CAMB transfer function or power spectrum output
+		raise ValueError("Unknown filename supplied")
 
-	return  np.interp( koverh, pk[:,0],pk[:,1])
+	if psfile: 
+		pk = cio.loadpowerspectrum(asciifile)
+		if not np.all(np.diff(pk[:,0])>0.):
+			raise ValueError("The k values in the power spectrum file are not in ascending order")
+
+		if koverh == None :
+			return (pk[:,0], pk[:,1])
+
+		return  koverh, np.interp( koverh, pk[:,0],pk[:,1])
+	if tkfile:
+		if pstype == "cb":
+			print "filename ", asciifile
+			pk = cio.cbpowerspectrum ( transferfile = asciifile , 
+				Omegacdm  =  cosmo.Oc0,
+				Omegab    =  cosmo.Ob0, 
+				h         =  cosmo.h, 
+				Omeganu   =  cosmo.On0,
+				As        =  cosmo.As, 
+				ns        =  cosmo.ns, 
+				koverh    =  None )
+
+			return (pk [:,0], pk[:,1])
+
+		if pstype == "matter" :
+			if koverh == None :
+				koverh = tmpfile[:,0]
+
+			transfer  = cio.loadtransfers( filename = asciifile) 
+
+			transfertuple = (transfer[:,0], transfer[:,-1])
+			ps = cio.matterpowerfromtransfersforsinglespecies(
+				koverh ,
+				transfer  = transfertuple,
+				h = cosmo.h ,
+				As = cosmo.As,
+				ns = cosmo.ns)
+
+
+			return (ps [:,0], ps[:,1])
+
+		
+		return koverh, pk 
+
+
+
+	#return  koverh, np.interp( koverh, pk[:,0],pk[:,1])
 
 
 
@@ -518,6 +578,7 @@ def dndlnM ( M ,
 	#rhocr = critdensity( h = h , 
 	#	unittype = "solarmassperMpc3") 
 
+	
 	sig = sigmaM (M ,  
 		ps , 
 		bgtype = bgtype, 
