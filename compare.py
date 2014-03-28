@@ -27,6 +27,7 @@ pkfile = dirn + "example_data/M000/m000n0_matterpower_fin.dat"
 #psrunfile = "/home/rbiswas/doc/CAMB_outs/m000r03/m000r03_matterpower_fin.dat"
 
 M000 = FCPL(H0 = 71. ,Om0  = 0.2647, Ob0 = 0., ns = 0.963, As = 2.16e-9)
+M000s = FCPL(H0 = 71. ,Om0  = 0.2647, Ob0 = 0., ns = 0.963, sigma8 = 0.8)
 M000p = FCPL(H0 = 71. ,Om0  = 0.3647, Ob0 = 0.0, ns = 0.963, As = 2.16e-9)
 
 Tks = cio.loadtransfers(filename = tkfile)
@@ -40,18 +41,28 @@ psfrompk = psu.powerspectrum(koverh = None, asciifile =pkfile)
 	#working transfer function example
 psfromtk = psu.powerspectrum(koverh = None, pstype ="cb", asciifile =tkfile, cosmo = M000)
 psfromtkm = psu.powerspectrum(koverh = None, pstype ="matter", asciifile =tkfile, cosmo = M000)
+psfromtkms = psu.powerspectrum(koverh = None, pstype ="matter", asciifile =tkfile, cosmo = M000s)
+psfromtkcbs = psu.powerspectrum(koverh = None, pstype ="cb", asciifile =tkfile, cosmo = M000s)
+psfromtkcbscb = psu.powerspectrum(koverh = None, pstype ="cb",sigma8type= "cb", asciifile =tkfile, cosmo = M000s)
+#psfromtkcbscb = psu.powerspectrum(koverh = None, pstype ="cb", asciifile =tkfile, cosmo = M000s)
 #print  len(psfromtk), "now"
-pscompfig, pscomp_ax0, pscomp_ax1 = pu.settwopanel()
+pscompfig, pscomp_ax0, pscomp_ax1 = pu.settwopanel(setdifflimits = [0.99,1.01])
 #pscompfig, pscomp_ax0, pscomp_ax1 = pu.settwopanel(setdifflimits = None)
+pscomp_ax0.loglog(psfromtk[0], psfromtk[1], label = "TKcb As=2.16e-9")
+pscomp_ax0.loglog(psfromtkm[0], psfromtkm[1], label = "TKm, As = 2.16e-9")
+pscomp_ax0.loglog(psfromtkms[0], psfromtkms[1], label = "TKm, sigma8 =0.8")
+pscomp_ax0.loglog(psfromtkcbs[0], psfromtkcbs[1], label = "TKcb, sigma8 =0.8")
+pscomp_ax0.loglog(psfromtkcbscb[0], psfromtkcbscb[1], label = "TKcb, sigma8 cb =0.8")
 pscomp_ax0.loglog(psfrompk[0], psfrompk[1], label = "PK")
-pscomp_ax0.loglog(psfromtk[0], psfromtk[1], label = "TK")
-pscomp_ax0.loglog(psfromtkm[0], psfromtkm[1], label = "TKm")
 pscomp_ax0.legend(loc="best")
-pscomp_ax1.plot(psfromtk[0], psfromtk[1]/psfrompk[1],label = "Tkcb")
-pscomp_ax1.plot(psfromtk[0], psfromtkm[1]/psfrompk[1],label = "Tkm")
+
+pscomp_ax1.plot(psfromtk[0], psfromtk[1]/psfrompk[1],label = "Tkcb, As = 2.16e-9")
+#pscomp_ax1.plot(psfromtk[0], psfromtkm[1]/psfrompk[1],label = "Tkm, As = 2.16e-9")
+pscomp_ax1.plot(psfromtk[0], psfromtkcbs[1]/psfrompk[1],label = "Tkcb, sigma8 = 0.8")
+pscomp_ax1.plot(psfromtk[0], psfromtkcbscb[1]/psfrompk[1],label = "Tkcb, sigma8 cb = 0.8")
+pscomp_ax1.legend(loc = "best")
 #pscomp_ax0.set_xscale('log')
-print psfrompk[1]/psfromtk[1]
-plt.show()
+#print psfrompk[1]/psfromtk[1]
 
 
 
@@ -90,7 +101,7 @@ sigmar_ax0.plot(Rad, psu.sigma(R = Rad, ps = psfrompk, cosmo = M000),"+", label 
 sigmar_ax0.set_ylabel(r'$\sigma (R) $')
 sigmar_ax0.legend(loc= "best", numpoints =1)
 sigmar_ax1.plot(Rad, sumansigmar/ psu.sigma(R = Rad, ps = psfrompk, cosmo = M000),"+", label = "sumanTF/PS")
-sigmar_ax1.set_xlabel(r'$R (h^{-1}Mpc) $')
+sigmar_ax1.set_xlabel(r'$R \/(h^{-1}Mpc) $')
 
 	#sigma as a function of halo mass
 sigmaMfig, sigmaM_ax0 , sigmaM_ax1 = pu.settwopanel()

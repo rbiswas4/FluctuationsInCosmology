@@ -18,9 +18,11 @@ import sys
 import matplotlib.pyplot as plt
 import typeutils as tu
 import massfunctions as mf
+import growthfunction
 import numpy as np
 import camb_utils.cambio as cio
 import utils.filters as filters
+
 
 def critdensity(h = 1.0, 
 	unittype = 'kgperm3') :
@@ -248,7 +250,9 @@ def powerspectrumfromfile(fname,
 def powerspectrum ( koverh , 
 	asciifile = None ,
 	pstype = "matter", 
+	sigma8type = "matter" ,
 	method = "CAMBoutfile",
+	z      = 0.0 , 
 	cosmo =  None ,
 	**params):
 
@@ -261,7 +265,165 @@ def powerspectrum ( koverh ,
 		koverh : array-like of floats or Nonetype, mandatory
 			k in units of h/Mpc
 		asciifile: string, 
-		method   : Method of obtaining power spectrum
+			Filename for power spectrum or CAMB transfer function. 
+			power sepctrum or transfer function input will be 
+			recognized from CAMB file structure.
+		method   : string, optional , defaults to "CAMBoutfile" 
+			Method of obtaining power spectrum with fixed options
+			options:
+			-------
+			CAMBoutfile   :assume that the asciifile output of CAMB 
+				is at desired redshift 
+			CAMBoutgrowth :Use the asciifile from CAMB output at 
+				z  = 0.0 , and use a growth function to find 
+				the power spectrum at z = z
+			
+			
+	returns:
+		tuple (koverh , power spectrum)
+
+	notes: should be able to obtain the powerspectrum in a variety of 
+		methods with code being added
+		Override Rules: 
+			sigma8 overrides As 
+			params dictionary overrides cosmo 
+	"""
+
+	if not method in ["CAMBoutfile"]:
+		raise ValueError("Method not defined")
+	if method in ["CAMBoutfile"] :
+		#Query CAMB file type
+		psfile, tkfile, Unknown = cambasciifiletype (asciifile)  
+
+	# decide whether As or sigma8 is to be used
+	sigma8 = None
+	As     = None 
+
+	if params.has_key("sigma8"):
+		if params.sigma8 != None : 
+			sigma8 = params["sigma8"]
+		if params.As != None :
+			As = params["As"]
+
+	if cosmo != None :
+		if cosmo.sigma8  != None:
+			if sigma8 == None: 
+				sigma8 = cosmo.sigma8 
+		if cosmo.As      != None:
+			if As == None :
+				As = cosmo.As
+
+	#If neither As or sigma8 are provided fail!
+	if As == None and sigma8 == None and not psfile :
+		raise ValueError("without As or sigma8 provided, matter power spectrum cannot be calculated from transfer functions\n") 
+	if sigma8 != None:
+		As = 1.0
+	
+
+	if params != None:
+		paramdict = params
+	paramdict["As"] = As
+		
+	print "VALUES passed on from powerspectrum routine \n"		
+	print "sigma8 = ", sigma8, " As ", As
+	print paramdict["As"], "IN powerspectrum"
+
+	pstmp  = __powerspectrum ( koverh = koverh, 
+		asciifile = asciifile  ,
+		pstype = pstype ,
+		method = method ,
+		z      = z , 
+		cosmo  =  cosmo ,
+		**paramdict )
+
+	#If sigma8 is given, we need to normalize power spectrum
+	#power spectrum to normalize is pssigma8
+	if sigma8 != None: 
+		if pstype !=sigma8type:	
+			pssigma8  = __powerspectrum ( koverh = koverh, 
+				asciifile = asciifile  ,
+				pstype = sigma8type ,
+				method = method ,
+				z      = z , 
+				cosmo  =  cosmo ,
+				**paramdict)
+	
+		else:
+			pssigma8  = pstmp 
+
+	
+	if sigma8 != None :
+		Asrel =  getAsrel (pssigma8 , sigma8, cosmo = cosmo, 
+			filt= filters.Wtophatkspacesq,  **paramdict) 
+		print "Now As has been determined to be ", sigma8type , Asrel
+		return (pstmp[0], Asrel*pstmp[1]) 
+
+	else :
+		return pstmp 
+ 
+def getvalsfromparams(cosmo, **params):
+
+ 
+	""" TO DO 
+	provide a general function to pass values into cosmo and params"""
+
+	return None
+
+def cambasciifiletype( fname ) :
+
+	# Decide whether this ia a matter or transfer file
+	psfile = False
+	tkfile = False
+	Unknown = True
+
+	tmpfile = np.loadtxt(fname )
+	shapetuple = np.shape(tmpfile)
+	if shapetuple[-1] == 7:
+		tkfile  = True
+		Unknown = False 
+	if shapetuple[-1] ==2 :
+		psfile  = True 	
+		Unknown  = False
+
+	if Unknown:
+		#file is not CAMB transfer function or power spectrum output
+		raise ValueError("Unknown filename supplied")
+		
+
+	return psfile, tkfile, Unknown 
+
+	
+def __powerspectrum ( koverh , 
+	asciifile = None ,
+	pstype = "matter", 
+	method = "CAMBoutfile",
+	z      = 0.0 , 
+	cosmo =  None ,
+	**params):
+
+	"""
+	DO NOT CALL DIRECTLY. CALL powerspectrum instead 
+	returns linearly interpolated values of the powerspectrum in the 
+	powerspectrumfile with k values in units of h/Mpc. Using
+	this with koverh = None, returns the values in the table. 
+
+	args:
+		koverh : array-like of floats or Nonetype, mandatory
+			k in units of h/Mpc
+		asciifile: string, 
+			Filename for power spectrum or CAMB transfer function. 
+			power sepctrum or transfer function input will be 
+			recognized from CAMB file structure.
+		method   : string, optional , defaults to "CAMBoutfile" 
+			Method of obtaining power spectrum with fixed options
+			options:
+			-------
+			CAMBoutfile   :assume that the asciifile output of CAMB 
+				is at desired redshift 
+			CAMBoutgrowth :Use the asciifile from CAMB output at 
+				z  = 0.0 , and use a growth function to find 
+				the power spectrum at z = z
+			
 			
 	returns:
 		tuple (koverh , power spectrum)
@@ -271,22 +433,26 @@ def powerspectrum ( koverh ,
 	"""
 
 	#ensure we are supposed to read CAMB outfiles
-	if method != "CAMBoutfile" :
+	if not method in ["CAMBoutfile"]:
 		raise ValueError("Method not defined")
 
-	# Decide whether this ia a matter or transfer file
-	psfile = False
-	tkfile = False
-	Unknown = True
+#	# Decide whether this ia a matter or transfer file
+#	psfile = False
+#	tkfile = False
+#	Unknown = True
+#
+#	shapetuple = np.shape(tmpfile)
+#	if shapetuple[-1] == 7:
+#		tkfile  = True
+#		Unknown = False 
+#	if shapetuple[-1] ==2 :
+#		psfile  = True 	
+#		Unknown  = False
 
+
+	psfile, tkfile, Unknown = cambasciifiletype ( asciifile )
+	
 	tmpfile = np.loadtxt(asciifile)
-	shapetuple = np.shape(tmpfile)
-	if shapetuple[-1] == 7:
-		tkfile  = True
-		Unknown = False 
-	if shapetuple[-1] ==2 :
-		psfile  = True 	
-		Unknown  = False
 	if koverh == None:
 		koverh = tmpfile[:,0]
 
@@ -304,6 +470,7 @@ def powerspectrum ( koverh ,
 
 		return  koverh, np.interp( koverh, pk[:,0],pk[:,1])
 	if tkfile:
+		print "AS " , params["As"]
 		if pstype == "cb":
 			print "filename ", asciifile
 			pk = cio.cbpowerspectrum ( transferfile = asciifile , 
@@ -311,7 +478,8 @@ def powerspectrum ( koverh ,
 				Omegab    =  cosmo.Ob0, 
 				h         =  cosmo.h, 
 				Omeganu   =  cosmo.On0,
-				As        =  cosmo.As, 
+				As        =  params["As"], 
+				#As        =  cosmo.As, 
 				ns        =  cosmo.ns, 
 				koverh    =  None )
 
@@ -328,7 +496,7 @@ def powerspectrum ( koverh ,
 				koverh ,
 				transfer  = transfertuple,
 				h = cosmo.h ,
-				As = cosmo.As,
+				As = params["As"],
 				ns = cosmo.ns)
 
 
@@ -453,8 +621,8 @@ def getAsrel (ps , sigma8, khmin = 1.0e-5 , khmax = 2.0, logkhint = 0.005 ,
 	"""
 
 	sigsq = sigmasq (ps , khmin= khmin, khmax =khmax,logkhint =logkhint, cosmo = cosmo, filt = filt , **params)  	
-	Assq = sigma8*sigma8 / sigsq 
-	return np.sqrt(Assq)
+	Asrel = sigma8*sigma8 / sigsq 
+	return Asrel
  
 
 def sigmaM (M , 
