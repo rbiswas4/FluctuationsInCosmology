@@ -1,4 +1,18 @@
 #!/usr/bin/env python
+#
+#This is a set of wrappers designed to use methods of obtaining linear 
+#quantities of interest from outputs of actual programs taht do the 
+#calculations, like CAMB with the help of utilities for specific programs.
+#
+#USEFUL ROUTINES:
+#
+#powerspectrum: obtains the linear power spectrum of various quantities from
+#---------------
+#	standard outputs of programs like CAMB
+#sigma
+#---------------
+#sigmaM
+#--------------
 		
 #CHANGES:
 #Only assign values to cosmo as default if values from cosmo are being used
@@ -288,7 +302,7 @@ def powerspectrum ( koverh ,
 			sigma8 overrides As 
 			params dictionary overrides cosmo 
 	"""
-
+	print params
 	if not method in ["CAMBoutfile"]:
 		raise ValueError("Method not defined")
 	if method in ["CAMBoutfile"] :
