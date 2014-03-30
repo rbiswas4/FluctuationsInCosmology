@@ -43,7 +43,7 @@ psfromtk = psu.powerspectrum(koverh = None, pstype ="cb", asciifile =tkfile, cos
 psfromtkm = psu.powerspectrum(koverh = None, pstype ="matter", asciifile =tkfile, cosmo = M000)
 psfromtkms = psu.powerspectrum(koverh = None, pstype ="matter", asciifile =tkfile, cosmo = M000s)
 psfromtkcbs = psu.powerspectrum(koverh = None, pstype ="cb", asciifile =tkfile, cosmo = M000s)
-psfromtkcbscb = psu.powerspectrum(koverh = None, pstype ="cb",sigma8type= "cb", asciifile =tkfile, cosmo = M000s)
+psfromtkcbscb = psu.powerspectrum(koverh = None, pstype ="cb",sigma8ype= "cb", asciifile =tkfile, cosmo = M000s)
 #psfromtkcbscb = psu.powerspectrum(koverh = None, pstype ="cb", asciifile =tkfile, cosmo = M000s)
 #print  len(psfromtk), "now"
 pscompfig, pscomp_ax0, pscomp_ax1 = pu.settwopanel(setdifflimits = [0.99,1.01])
