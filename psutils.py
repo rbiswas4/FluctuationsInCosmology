@@ -16,7 +16,7 @@
 
 import sys
 import matplotlib.pyplot as plt
-import typeutils as tu
+import utils.typeutils as tu
 import massfunctions as mf
 import growthfunction
 import numpy as np
@@ -24,6 +24,7 @@ import camb_utils.cambio as cio
 import utils.filters as filters
 
 
+verbose  = True
 def critdensity(h = 1.0, 
 	unittype = 'kgperm3') :
 
@@ -340,6 +341,8 @@ def powerspectrum ( koverh ,
 	#power spectrum to normalize is pssigma8
 	if sigma8 != None: 
 		if pstype !=sigma8type:	
+			if verbose:
+				print "evaluate sigmatype ps \n"
 			pssigma8  = __powerspectrum ( koverh = koverh, 
 				asciifile = asciifile  ,
 				pstype = sigma8type ,
