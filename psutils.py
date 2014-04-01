@@ -303,13 +303,21 @@ def powerspectrum ( koverh ,
 			sigma8 overrides As 
 			params dictionary overrides cosmo 
 	"""
-	print params
-	if not method in ["CAMBoutfile"]:
+	#print params
+	if not method in ["CAMBoutfile","CAMBoutgrowth"]:
 		raise ValueError("Method not defined")
-	if method in ["CAMBoutfile"] :
+	if method in ["CAMBoutfile", "CAMBoutgrowth"] :
 		#Query CAMB file type
 		psfile, tkfile, Unknown = cambasciifiletype (asciifile)  
 
+	if method == "CAMBoutgrowth":
+		if cosmo == None and z >0.000001 :
+			raise ValueErrror("Method does not work if cosmo is not defined")
+	Dg = 1.0 
+	if cosmo !=None:
+		if z > 0.001:
+			Dg = cosmo.growth(z)[0]
+		
 	# decide whether As or sigma8 is to be used
 	sigma8 = None
 	As     = None 
@@ -368,15 +376,23 @@ def powerspectrum ( koverh ,
 		else:
 			pssigma8  = pstmp 
 
+	if method == "CAMBoutgrowth" :
+		psret = pstmp[0],Dg*Dg*pstmp[1]
+	else: 
+		psret = pstmp
 	
 	if sigma8 != None :
 		Asrel =  getAsrel (pssigma8 , sigma8, cosmo = cosmo, 
 			filt= filters.Wtophatkspacesq,  **paramdict) 
 		print "Now As has been determined to be ", sigma8type , Asrel
-		return (pstmp[0], Asrel*pstmp[1]) 
+		#print np.shape(psret[0]), np.shape(psret[1])
+		v = psret[0], Asrel*psret[1] 
+		#print np.shape(v[0]), np.shape(v[1])
+		#print v
+		return v
 
 	else :
-		return pstmp 
+		return psret 
  
 def getvalsfromparams(cosmo, **params):
 
@@ -450,7 +466,7 @@ def __powerspectrum ( koverh ,
 	"""
 
 	#ensure we are supposed to read CAMB outfiles
-	if not method in ["CAMBoutfile"]:
+	if not method in ["CAMBoutfile","CAMBoutgrowth"]:
 		raise ValueError("Method not defined")
 
 #	# Decide whether this ia a matter or transfer file
@@ -488,6 +504,8 @@ def __powerspectrum ( koverh ,
 		return  koverh, np.interp( koverh, pk[:,0],pk[:,1])
 	if tkfile:
 		print "AS " , params["As"]
+		#print cosmo.Ob0, cosmo.Oc0
+	
 		if pstype == "cb":
 			print "filename ", asciifile
 			pk = cio.cbpowerspectrum ( transferfile = asciifile , 

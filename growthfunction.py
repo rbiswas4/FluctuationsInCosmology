@@ -28,8 +28,12 @@ def omeganuh2a( a ,
 		method:
 
 	"""
-	import typeutils as tu
+	import utils.typeutils as tu
 
+	if tu.isiterable(a) :
+		a  = np.asarray(a) 
+	else :
+		a = np.asarray([a])
 	if sigmamass !=None:
 		#mass  = sigmamass /Neff 
 		omeganuh2 =  sigmamass / 94.0 

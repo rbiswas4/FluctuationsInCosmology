@@ -88,12 +88,12 @@ class FCPL (w0waCDM) :
 	@property
 	def On0 (self) :
 			#For now 
-		On0 = self._sigmamnu / 94.0
+		On0 = self._sigmamnu / 94.0 /self.h /self.h
 		return On0
 	@property
 	def Oc0 (self) :
 		#print type(self.Om0), self._Ob0 , self._sigmamnu /94.0
-		Oc0 = self.Om0 - self._Ob0 - self._sigmamnu/94.0 
+		Oc0 = self.Om0 - self._Ob0 - self.On0
 		return Oc0
 
 
