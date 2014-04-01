@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import sys
 import numpy as np
 
 	
@@ -34,6 +35,9 @@ def omeganuh2a( a ,
 		a  = np.asarray(a) 
 	else :
 		a = np.asarray([a])
+
+	print a
+	sys.exit()
 	if sigmamass !=None:
 		#mass  = sigmamass /Neff 
 		omeganuh2 =  sigmamass / 94.0 
@@ -252,8 +256,8 @@ def interp_D(zseek, ascale, D0, D1):
 	"""
 
 	aseek    = 1/(1+zseek)
-	Dseek    = np.interp(aseek, ascale, D0)
-	logDseek = np.interp(aseek, ascale, D1)
+	Dseek    = np.interp(aseek, ascale, D0, left = np.nan , right = np.nan)
+	logDseek = np.interp(aseek, ascale, D1, left = np.nan , right = np.nan)
 
 	return (Dseek, logDseek)
 

@@ -351,7 +351,7 @@ def powerspectrum ( koverh ,
 	print "sigma8 = ", sigma8, " As ", As
 	print paramdict["As"], "IN powerspectrum"
 
-	pstmp  = __powerspectrum ( koverh = koverh, 
+	pstmp  = __powerspectrum ( koverh = None, 
 		asciifile = asciifile  ,
 		pstype = pstype ,
 		method = method ,
@@ -365,7 +365,7 @@ def powerspectrum ( koverh ,
 		if pstype !=sigma8type:	
 			if verbose:
 				print "evaluate sigmatype ps \n"
-			pssigma8  = __powerspectrum ( koverh = koverh, 
+			pssigma8  = __powerspectrum ( koverh = None, 
 				asciifile = asciifile  ,
 				pstype = sigma8type ,
 				method = method ,
@@ -382,23 +382,34 @@ def powerspectrum ( koverh ,
 		psret = pstmp
 	
 	if sigma8 != None :
+
 		Asrel =  getAsrel (pssigma8 , sigma8, cosmo = cosmo, 
 			filt= filters.Wtophatkspacesq,  **paramdict) 
 		print "Now As has been determined to be ", sigma8type , Asrel
-		#print np.shape(psret[0]), np.shape(psret[1])
 		v = psret[0], Asrel*psret[1] 
-		#print np.shape(v[0]), np.shape(v[1])
-		#print v
-		return v
-
 	else :
-		return psret 
+		v = psret 
+
+	
+	if koverh != None:
+		ret = koverh, np.interp(koverh, v[0], v[1], 
+			left = np.nan , right = np.nan) 
+		print "The problem "
+		print koverh
+		print v[0]
+		print v[1]
+		print ret
+		return ret
+	else: 
+		return v 
  
 def getvalsfromparams(cosmo, **params):
 
  
-	""" TO DO 
-	provide a general function to pass values into cosmo and params"""
+	""" 
+	TO DO 
+	provide a general function to pass values into cosmo and params
+	"""
 
 	return None
 
@@ -501,7 +512,7 @@ def __powerspectrum ( koverh ,
 		if koverh == None :
 			return (pk[:,0], pk[:,1])
 
-		return  koverh, np.interp( koverh, pk[:,0],pk[:,1])
+		return  koverh, np.interp( koverh, pk[:,0],pk[:,1],left = np.nan, right = np.nan)
 	if tkfile:
 		print "AS " , params["As"]
 		#print cosmo.Ob0, cosmo.Oc0
@@ -542,7 +553,6 @@ def __powerspectrum ( koverh ,
 
 
 
-	#return  koverh, np.interp( koverh, pk[:,0],pk[:,1])
 
 
 
@@ -621,7 +631,7 @@ def sigmasq (ps , R = 8. , usenative = True, khmin = 0.9e-5 , khmax = 5.0, logkh
 	k  = khvals * h  
 	
 
-	psinterp = np.interp (khvals , ps[0], ps[1])
+	psinterp = np.interp (khvals , ps[0], ps[1], left = np.nan, right = np.nan)
 
 	#plt.loglog(khvals, psinterp, label="interp")
 	#plt.loglog(ps[0], ps[1], label="native")
