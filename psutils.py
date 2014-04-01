@@ -376,19 +376,15 @@ def powerspectrum ( koverh ,
 		else:
 			pssigma8  = pstmp 
 
-	if method == "CAMBoutgrowth" :
-		psret = pstmp[0],Dg*Dg*pstmp[1]
-	else: 
-		psret = pstmp
 	
 	if sigma8 != None :
 
 		Asrel =  getAsrel (pssigma8 , sigma8, cosmo = cosmo, 
 			filt= filters.Wtophatkspacesq,  **paramdict) 
 		print "Now As has been determined to be ", sigma8type , Asrel
-		v = psret[0], Asrel*psret[1] 
+		v = pstmp[0], Asrel*pstmp[1] 
 	else :
-		v = psret 
+		v = pstmp 
 
 	
 	if koverh != None:
@@ -399,10 +395,14 @@ def powerspectrum ( koverh ,
 		print v[0]
 		print v[1]
 		print ret
-		return ret
+		#return ret
 	else: 
-		return v 
+		ret =  v 
  
+	if method == "CAMBoutgrowth" :
+		return ret[0],Dg*Dg*ret[1]
+	else: 
+		return ret
 def getvalsfromparams(cosmo, **params):
 
  

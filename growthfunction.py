@@ -36,14 +36,14 @@ def omeganuh2a( a ,
 	else :
 		a = np.asarray([a])
 
-	print a
-	sys.exit()
 	if sigmamass !=None:
 		#mass  = sigmamass /Neff 
 		omeganuh2 =  sigmamass / 94.0 
 
+	#print "a ", a
+	#print omegagammah2
 
-	omeganumasslessh2  = Neff*omegagammah2 
+	omeganumasslessh2  = Neff*omegagammah2
 	omeganumasslessh2 *= (7.0/8.0) *(4.0/11.0)**(4.0/3.0)/a**4.0
 
 	omeganumassiveh2a =  omeganuh2 /a**3.0
@@ -90,7 +90,7 @@ def HoverH0(z , Omegam , w0 ,wa ,  h ,
 	a = 1.0 /(1.0+ z)
 		#Omega values at z = 0 
 
-	Omegagamma = 2.471e-5/h/h * (Tcmb/2.725)**4.0   
+	Omegagamma = 2.471e-5/h/h * (Tcmb.value/2.725)**4.0   
 
 		#Bad philosophically, OK approx, but in HACC
 	#Omeganumassless = Neff*Omegagamma * (7.0/8.0) *(4.0/11.0)**(4.0/3.0)
@@ -112,6 +112,9 @@ def HoverH0(z , Omegam , w0 ,wa ,  h ,
 		method =  "HACC")
 
 
+	#print "omeganuh2 " , omeganuh2 
+	#print "omeganuh20 ", omeganuh20
+	#print Omegam , Omegagamma
 	Omegade    = 1.0 - Omegam  - Omegagamma - omeganuh20/h/h
 		#Relative density at different redshift
 	rhode = Omegade * (1.0 + z )**(3.0 *(w0 + wa + 1.0))
