@@ -39,6 +39,13 @@ import utils.filters as filters
 
 
 verbose  = True
+def loginterp(xreq, xnative, ynative , left = np.nan , right = np.nan):
+
+        logxreq = np.log(xreq)
+        npinterp  = np.interp(logxreq , np.log(xnative), np.log(ynative), left = np.nan, right = np.nan)
+
+        return np.exp(npinterp)
+
 def critdensity(h = 1.0, 
 	unittype = 'kgperm3') :
 
@@ -269,6 +276,7 @@ def powerspectrum ( koverh ,
 	method = "CAMBoutfile",
 	z      = 0.0 , 
 	cosmo =  None ,
+	interpmethod  = 'log' , 
 	**params):
 
 	"""
@@ -388,8 +396,14 @@ def powerspectrum ( koverh ,
 
 	
 	if koverh != None:
-		ret = koverh, np.interp(koverh, v[0], v[1], 
-			left = np.nan , right = np.nan) 
+		if interpmethod == "linear":
+			ret = koverh, np.interp(koverh, v[0], v[1], 
+				left = np.nan , right = np.nan) 
+		else:
+			interpmethod = "log"
+			ret = koverh, loginterp(koverh, v[0], v[1], 
+				left = np.nan , right = np.nan) 
+			
 		print "The problem "
 		print koverh
 		print v[0]
