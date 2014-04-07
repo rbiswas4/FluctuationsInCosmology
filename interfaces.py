@@ -142,6 +142,33 @@ class FCPL (w0waCDM) :
 		return D, logD 
 
 		
+	def growthsourced(self, z ):
+		""" 
+		returns the linear growth function D0, and the derivative D1 
+		of the linear growth function with respect to the scale factor 
+		(CHECK) for the cosmology at redshift z
+
+		args:
+			z: array-like, make sure they are floats not ints
+		returns:
+			tuple of D0, and D1 values at the requested redshifts
+			
+		"""
+		import growthfunction as gf
+
+		h = self.h
+		omegacb = self.Ob0 + self.Oc0 
+		#print "line 93", type(self.On0), type(h)
+		omeganuh2 = self.On0 * h * h 
+		avals, D, info  = gf.growth(Omegam = omegacb + self.On0,
+			w0 = self.w0 , wa = self.wa , Tcmb = self.Tcmb0 , 
+			h = self.h , Neff = self.Neff , 
+			omeganuh2val =  omeganuh2 )
+
+
+		D , logD = gf.interp_D( z, avals, D[:,0], D[:,1])
+
+		return D, logD 
 if __name__=="__main__":
 
 	f = FCPL ( H0 = 65, Om0 = 0.99 , w0 = -1.0, wa =0.) 

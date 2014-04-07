@@ -38,7 +38,7 @@ import camb_utils.cambio as cio
 import utils.filters as filters
 
 
-verbose  = True
+verbose  = False
 def loginterp(xreq, xnative, ynative , left = np.nan , right = np.nan):
 
         logxreq = np.log(xreq)
@@ -291,6 +291,8 @@ def powerspectrum ( koverh ,
 			Filename for power spectrum or CAMB transfer function. 
 			power sepctrum or transfer function input will be 
 			recognized from CAMB file structure.
+		cosmo    : interfacecosmology/astropy cosmological model
+			
 		method   : string, optional , defaults to "CAMBoutfile" 
 			Method of obtaining power spectrum with fixed options
 			options:
@@ -300,8 +302,11 @@ def powerspectrum ( koverh ,
 			CAMBoutgrowth :Use the asciifile from CAMB output at 
 				z  = 0.0 , and use a growth function to find 
 				the power spectrum at z = z
-			
-			
+		interpmethod: string, optional, defaults to 'log'
+			options:
+				'log': linearly interpolates 
+				log(koverh) vs log(PS) in units of h^#/Mpc^3
+				'linear' : linearly interpolates koverh and PS
 	returns:
 		tuple (koverh , power spectrum)
 
@@ -355,9 +360,10 @@ def powerspectrum ( koverh ,
 		paramdict = params
 	paramdict["As"] = As
 		
-	print "VALUES passed on from powerspectrum routine \n"		
-	print "sigma8 = ", sigma8, " As ", As
-	print paramdict["As"], "IN powerspectrum"
+	#print "VALUES passed on from powerspectrum routine \n"		
+	if verbose:
+		print "sigma8 = ", sigma8, " As ", As
+	#print paramdict["As"], "IN powerspectrum"
 
 	pstmp  = __powerspectrum ( koverh = None, 
 		asciifile = asciifile  ,
@@ -389,7 +395,7 @@ def powerspectrum ( koverh ,
 
 		Asrel =  getAsrel (pssigma8 , sigma8, cosmo = cosmo, 
 			filt= filters.Wtophatkspacesq,  **paramdict) 
-		print "Now As has been determined to be ", sigma8type , Asrel
+		#print "Now As has been determined to be ", sigma8type , Asrel
 		v = pstmp[0], Asrel*pstmp[1] 
 	else :
 		v = pstmp 
@@ -404,12 +410,6 @@ def powerspectrum ( koverh ,
 			ret = koverh, loginterp(koverh, v[0], v[1], 
 				left = np.nan , right = np.nan) 
 			
-		print "The problem "
-		print koverh
-		print v[0]
-		print v[1]
-		print ret
-		#return ret
 	else: 
 		ret =  v 
  
@@ -528,11 +528,11 @@ def __powerspectrum ( koverh ,
 
 		return  koverh, np.interp( koverh, pk[:,0],pk[:,1],left = np.nan, right = np.nan)
 	if tkfile:
-		print "AS " , params["As"]
+		#print "AS " , params["As"]
 		#print cosmo.Ob0, cosmo.Oc0
 	
 		if pstype == "cb":
-			print "filename ", asciifile
+			#print "filename ", asciifile
 			pk = cio.cbpowerspectrum ( transferfile = asciifile , 
 				Omegacdm  =  cosmo.Oc0,
 				Omegab    =  cosmo.Ob0, 
@@ -858,7 +858,7 @@ if __name__=="__main__":
 	#pk = cio.loadpowerspectrum ("example_data/LCDM_def_matterpower.dat")
 	pk = cio.loadpowerspectrum ("LCDM_matterpower.dat")
 	ts = cio.loadtransfers(filename = "example_data/LCDM_def_transfer_out.dat")
-	print np.shape(ts)
+	#print np.shape(ts)
 	#print pk[:,0]
 	pkt = cio.matterpowerfromtransfersforsinglespecies(koverh = pk[:,0], 
 		transfer = (ts[:,0],ts[:,-1]), h = 0.71, As = 2.1e-9, ns  = 0.963)
@@ -868,13 +868,13 @@ if __name__=="__main__":
 	
 	plt.figure()
 	from astropy.cosmology import Planck13 as cosmo
-	print sigma(ps = (pk[:,0],pk[:,1]) , R = 8.0, cosmo = cosmo)
+	#print sigma(ps = (pk[:,0],pk[:,1]) , R = 8.0, cosmo = cosmo)
 	#plt.show()
 	sys.exit()
 	M = 10.**(np.arange(7,16,0.2))
 	R = np.arange(0.0005, 50.0,0.1)
 	#R = np.array([4,8,12])
-	print sigma (8.0)
+	#print sigma (8.0)
 	plt.figure()
 	plt.plot(R, sigma(R))
 	plt.xlabel("R ( Mpc /h )") 
