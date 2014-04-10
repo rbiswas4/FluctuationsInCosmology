@@ -13,6 +13,18 @@ def __SP (
 	A = A0 / (1. + z )**alpha
 	return A 
 
+def fsigmaMICE(
+	sigma , z ) :
+	"""
+	"""
+	z = np.asarray(z)
+
+	A = 0.58 * (1.0 + z )**(-0.13)
+	a = 1.37 * (1.0 + z ) ** (-0.15)
+	b = 0.3  * (1.0 + z )**(-0.084)
+	c = 1.036 * (1.0 + z) **(-0.024)
+
+ 	return A * ( sigma**(-a) + b ) *np.exp( - c/sigma/sigma )
 #def fsigmaBhattacharya(
 #	Mass , 
 #	deltac = 1.674 , 
