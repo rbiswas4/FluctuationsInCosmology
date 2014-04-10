@@ -13,53 +13,53 @@ def __SP (
 	A = A0 / (1. + z )**alpha
 	return A 
 
-def fsigmaBhattacharya(
-	Mass , 
-	deltac = 1.674 , 
-	z = 0.0 ,
-	A0  = 0.333 ,
-	a0 = 0.788 , 
-	p0 = 0.807 , 
-	q0 = 1.795 , 
-	alpha1 = 0.11 ,  
-	alpha2 = 0.01 , 
-	alpha3 = 0.0 , 
-	alpha4 =  0.0,  
-	Mlow = 6e11 , 
-	Mhigh = 3e15) :
-
-	"""
-	"Produces the fit from Bhattacharya etal. in Table 4 of 
-	http://arxiv.org/pdf/1005.2239.pdf
-	f(sigma ) =  A(z) (1.0 +(\sigma^2/\delta_c^2/a)^p)\frac{2}{\pi}\exp( -\frac{a \delta^2_c}{2\sigma^2}) 
-	
-	
-	args:
-
-	returns: 
-	"""	
-	import psutils as psu
-
-	#return only values within mass range where fit is advertised
-	Ml = Mass > Mlow  
-	Mh = Mass < Mhigh   
-
-	Mass = Mass[Ml & Mh ]
-
-	sigmaM = psu.sigmaM(M= Masses, ps = ps, cosmo = cosmo, z ) 
-
-	return __fsigmaBhattacharya ( sigmaM , 
-		deltac = 1.674 ,
-	A0 = 0.333 , 
-	a0 = 0.788 , 
-	p0 = 0.807 , 
-	q0 = 1.795 , 
-	alpha1 = 0.11 ,  
-	alpha2 = 0.01 , 
-	alpha3 = 0.0 , 
-	alpha4 =  0.0,  
-	Mlow = 6e11 , 
-	Mhigh = 3e15)
+#def fsigmaBhattacharya(
+#	Mass , 
+#	deltac = 1.674 , 
+#	z = 0.0 ,
+#	A0  = 0.333 ,
+#	a0 = 0.788 , 
+#	p0 = 0.807 , 
+#	q0 = 1.795 , 
+#	alpha1 = 0.11 ,  
+#	alpha2 = 0.01 , 
+#	alpha3 = 0.0 , 
+#	alpha4 =  0.0,  
+#	Mlow = 6e11 , 
+#	Mhigh = 3e15) :
+#
+#	"""
+#	"Produces the fit from Bhattacharya etal. in Table 4 of 
+#	http://arxiv.org/pdf/1005.2239.pdf
+#	f(sigma ) =  A(z) (1.0 +(\sigma^2/\delta_c^2/a)^p)\frac{2}{\pi}\exp( -\frac{a \delta^2_c}{2\sigma^2}) 
+#	
+#	
+#	args:
+#
+#	returns: 
+#	"""	
+#	import psutils as psu
+#
+#	#return only values within mass range where fit is advertised
+#	Ml = Mass > Mlow  
+#	Mh = Mass < Mhigh   
+#
+#	Mass = Mass[Ml & Mh ]
+#
+#	sigmaM = psu.sigmaM(M= Masses, ps = ps, cosmo = cosmo, z ) 
+#
+#	return __fsigmaBhattacharya ( sigmaM , 
+#		deltac = 1.674 ,
+#	A0 = 0.333 , 
+#	a0 = 0.788 , 
+#	p0 = 0.807 , 
+#	q0 = 1.795 , 
+#	alpha1 = 0.11 ,  
+#	alpha2 = 0.01 , 
+#	alpha3 = 0.0 , 
+#	alpha4 =  0.0,  
+#	Mlow = 6e11 , 
+#	Mhigh = 3e15)
 def __fsigmaBhattacharya (  
 	sigma ,
 	deltac = 1.674 , 
