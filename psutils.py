@@ -110,7 +110,7 @@ def critdensity(h = 1.0,
 
 	return rhocritu 
 
-def __rhobg ( z = 0.0 , bgtype = "matter", unittype = "solarmassperMpc3", 
+def __rhobg ( z = 0.0 , bgtype = "cb", unittype = "solarmassperMpc3", 
 	cosmo = None):
 
 	"""returns the background density at redshift z. If bgtype = "matter"
