@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 
+#import utils
 import psutils  as psu
 import massfunctions as mf
 
@@ -120,6 +121,8 @@ def dndlnM0 ( M ,
 		added argument deltac with default value 1.674 
 	"""
 
+	#z = np.asarray(z, dtype = float)
+
 	h = cosmo.H0/100.0
 	#rhocr = critdensity( h = h , 
 	#	unittype = "solarmassperMpc3") 
@@ -167,7 +170,7 @@ def dndlnM0 ( M ,
 	else: 
 		raise ValueError("This fitting form is not implemented")
 
-	rhobg = psu.__rhobg( z =z , bgtype = bgtype, 
+	rhobg = psu.__rhobg( z =0. , bgtype = bgtype, 
 		unittype = "solarmassperMpc3",  cosmo = cosmo)
 	 
 	dndlnM = rhobg *f_sigma *dlsinvdlM /M 

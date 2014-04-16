@@ -316,22 +316,26 @@ def powerspectrum ( koverh ,
 			sigma8 overrides As 
 			params dictionary overrides cosmo 
 	"""
-	#print params
+
+	#Make sure evaluation method is implemented
 	if not method in ["CAMBoutfile","CAMBoutgrowth"]:
 		raise ValueError("Method not defined")
 	if method in ["CAMBoutfile", "CAMBoutgrowth"] :
-		#Query CAMB file type
+		#Query CAMB file type: power spectrum or transfer
 		psfile, tkfile, Unknown = cambasciifiletype (asciifile)  
 
 	if method == "CAMBoutgrowth":
+		#cannot calculate growth if cosmo not provided
 		if cosmo == None and z >0.000001 :
 			raise ValueErrror("Method does not work if cosmo is not defined")
+
 	Dg = 1.0 
 	if cosmo !=None:
-		if z > 0.001:
+		if z > 0.000001:
 			Dg = cosmo.growth(z)[0]
 		
 	# decide whether As or sigma8 is to be used
+	# if sigma8 provided use it, otherwise As
 	sigma8 = None
 	As     = None 
 
@@ -495,6 +499,7 @@ def __powerspectrum ( koverh ,
 		raise ValueError("Method not defined")
 
 #	# Decide whether this ia a matter or transfer file
+	#This has been made a function
 #	psfile = False
 #	tkfile = False
 #	Unknown = True
