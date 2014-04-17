@@ -36,6 +36,7 @@ def particlemass(
 	species given the number of particles in the simulations, the length 
 	scale of simulation, and the relative density of the species wrt 
 	the critical density and the hubble parameter h = H0/100.
+	"""
 
 	args:
 		numparticlescuberoot : float, mandatory
