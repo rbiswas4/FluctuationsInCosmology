@@ -6,7 +6,7 @@ import psutils  as psu
 import massfunctions as mf
 
 
-def dndlnM ( M ,
+def __dndlnM ( M ,
 	ps , 
 	z = 0. ,
 	khmin = 1.0e-5,
@@ -150,6 +150,7 @@ def dndlnM0 ( M ,
 		logkhint = logkhint , 
 		**params ) 
 
+	print z, sigm, dlsinvdlM , deltac 
 	if fittingform == "Bhattacharya10":
 		f_sigma = mf.__fsigmaBhattacharya (
 		 sigma = sigm,
