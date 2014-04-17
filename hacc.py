@@ -15,11 +15,13 @@ def haccredshiftsforstep(stepnumber ,
 	zfinal  = 0. ,
 	numsteps = 500) :
 
+	"""Changed haccredshiftsforstep to match Adrian's time stepper doc"
+
 	ain  =  1.0/(1.0 + zin) 
 	afinal  =  1.0/(1.0 + zfinal) 
 	astep =  (afinal - ain)/numsteps 
 
-	aatstep = astep * stepnumber + ain 
+	aatstep = astep * (stepnumber +1.)+ ain 
 	z = 1.0/aatstep - 1.0 
 
 	return z 
