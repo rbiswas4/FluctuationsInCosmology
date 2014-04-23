@@ -104,7 +104,7 @@ def __fsigmaBhattacharya (
 	p = __SP (p0, alpha3, z )
 	q = __SP (q0, alpha4, z )  
 
-	print A , a, p, q 
+	#print A , a, p, q 
 	
 
 	f  = A * np.sqrt(2.0 / np.pi) 

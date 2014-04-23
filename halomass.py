@@ -150,7 +150,8 @@ def dndlnM0 ( M ,
 		logkhint = logkhint , 
 		**params ) 
 
-	print z, sigm, dlsinvdlM , deltac 
+	#used this to figure out what problems were
+	#print z, sigm, dlsinvdlM , deltac 
 	if fittingform == "Bhattacharya10":
 		f_sigma = mf.__fsigmaBhattacharya (
 		 sigma = sigm,
