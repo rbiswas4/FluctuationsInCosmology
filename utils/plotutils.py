@@ -80,6 +80,7 @@ def drawxband(refval ,
 def settwopanel( height_ratios = [1.0,0.3], 
 	width_ratios = [1.,0.] ,
 	padding = None, 
+	setdifflimits = [0.9, 1.1 ] , 
 	setoffset = None, 
 	figsize  = None ):
 
@@ -126,6 +127,10 @@ def settwopanel( height_ratios = [1.0,0.3],
 
 	ax0 = plt.subplot(gs[0]) 
 	ax1 = plt.subplot(gs[1])
+
+	if setdifflimits != None:
+		ax1.set_ylim(setdifflimits )
+
 	ax0.set_xticklabels("",visible = False)
 	ax1.yaxis.set_major_formatter(majorformatter)
 

@@ -166,7 +166,7 @@ def __rhobg ( z = 0.0 , bgtype = "cb", unittype = "solarmassperMpc3",
 
 def filterradiusformass( M , 
 	z = 0. , 
-	bgtype = "matter" , 
+	bgtype = "cb" , 
 	cosmo = None):
 
 	"""
@@ -722,6 +722,9 @@ def sigmaM (M ,
 	R =  filterradiusformass( M  , bgtype= bgtype, z = z, cosmo = cosmo)
 	RinMpcoverh = R*h 
 
+	
+	print "RinMpcoverh ***************"
+	print RinMpcoverh 
 	#return RinMpcoverh 	
 	return sigma( ps , R = RinMpcoverh, khmin = khmin , khmax = khmax, logkhint = logkhint , cosmo= cosmo, **params) 
 
