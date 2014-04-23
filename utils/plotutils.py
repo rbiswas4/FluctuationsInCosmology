@@ -134,6 +134,9 @@ def settwopanel( height_ratios = [1.0,0.3],
 	ax0.set_xticklabels("",visible = False)
 	ax1.yaxis.set_major_formatter(majorformatter)
 
+	ax0.grid(True)
+	ax1.grid(True)
+
 	hpad  = 0.0 
 	#gridspec.update(hpad = hpad)
 	return fig , ax0 , ax1
