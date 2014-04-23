@@ -141,12 +141,21 @@ def _hacccosmo(inputfile ) :
 		sigma8  = hacc['SS8']
 		ns = hacc['NS']
 
+		print "printing omeganu **************"
+		print Omega_nu
 		return (H0 , Omega_m , Omega_nu, Omega_b , w0, wa , sigma8, ns) #check 
 		
 
 
  
 class haccsim (object ) :
+	"""
+
+	BUG FIX: sigmamnu calculation from Omega_nu corrected for factor 
+		of h^2 :
+		R. Biswas, Wed Apr 23 00:50:38 CDT 2014
+
+	"""
 
 	def __init__(self, indatfile , 
 		name  = None , 
@@ -163,14 +172,18 @@ class haccsim (object ) :
 		#set cosmo:
 		from interfaces import FCPL 
 		H0 , Omega_m , Omega_nu , Omega_b, w0, wa, sigma8  , ns =  _hacccosmo(indatfile) 
-		sigma_mnu = Omega_nu*94.0 
+		h = H0/ 100.
+		sigma_mnu = Omega_nu*94.0 *h *h 
 		#print sigma_mnu 
 		#sys.exit()
+		print "From indat " , Omega_nu
 		
 		self.cosmo = FCPL ( H0 = H0 , Om0 = Omega_m , Ob0 = Omega_b , 
 			sigmamnu = sigma_mnu , w0 = w0, wa = wa, 
 			sigma8 = sigma8  , ns = ns)
 
+
+		print "From cosmo " , self.cosmo.On0 
 
 		#set sim properties
 		haccsimdict = simdict (haccdict )
@@ -240,7 +253,7 @@ class haccsim (object ) :
 		s  = "SUMMARY OF simulation, name = "+ self.name  
 		s += "\n\n========================================\n\n"
 		s += "Cosmology\n====================\n" 
-		s += "massive neutrino energy density " + str(self.cosmo.sigmamnu/94.0) + "\n"
+		s += "massive neutrino energy density h^2" + str(self.cosmo.sigmamnu/94.0) + "\n"
 		s += "massive neutrino energy density " + str(self.cosmo.On0) + "\n"
 		s += "Simulation Properties\n=====================\n\n"
 
