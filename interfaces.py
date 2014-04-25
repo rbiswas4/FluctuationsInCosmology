@@ -19,6 +19,7 @@ class FCPL (w0waCDM) :
 		H0 = 70. , 
 		Om0 = 0.3, 
 		Ob0 = 0.02256, 
+		Ok0 = 0.0  ,
 		ns = 0.96 , 
 		As = None , 
 		sigma8 = None , 
@@ -32,10 +33,24 @@ class FCPL (w0waCDM) :
 		setvaluesfrom = None , 
 		name='FCPL'):
 		
+
+		from astropy.cosmology import FlatwCDM 
+		tmpmodel = FlatwCDM(
+			H0 = H0, 
+			Om0 = Om0, 
+			#Ok0 = 0.,
+			w0 = w0 , 
+			Tcmb0 = Tcmb0,
+			Neff =Neff, 
+			name = 'tmp') 
+
+		Ode0= 1.0 - Om0 - tmpmodel.Ogamma0 - tmpmodel.Onu0 - Ok0 
+
 		w0waCDM.__init__(self, 
 			H0 = H0, 
 			Om0 = Om0, 
-			Ode0 = 1. - Om0,
+			Ode0 = Ode0 ,
+			#Ok0 = 0.,
 			w0 = w0 , 
 			wa = wa , 
 			Tcmb0 = Tcmb0,
@@ -112,6 +127,35 @@ class FCPL (w0waCDM) :
 
 
 	#new methods:
+	def summary(self ) :
+		h = self.h
+
+		s  = "********************************\n"
+		s += "==========Cosmology=============\n" 
+		s += " h      = " + str(self.h) +"\n"
+		s += "==========Relativistic===========\n" 
+		s += "\Omega_\gamma                  =  " + str(self.Ogamma0)  + "\n" 
+		s += "\Omega_nu_0                   =  " + str(self.Onu0)  + "\n" 
+		s += "--------------------------------\n"
+		relenergydensity  = self.Ogamma0 + self.Onu0 
+		s += "sum                            =  " + str(relenergydensity)  + "\n"
+
+
+		s += "sum of masses of nu /94.0 = "+ str(self.sigmamnu/94.0) + "\n"
+		s += "sum of masses of nu /94.0/h^2 = "+ str(self.sigmamnu/94.0/h/h) + "\n"
+		s += "\Omega_{nu} (massive)   " + str(self.On0) + "\n"
+		s += "\Omega_{cdm}"+ str(self.Oc0) + "\n"
+		s += "\Omega_{b}"+ str(self.Ob0) + "\n"
+		s += "--------------------------------\n"
+		s += "sum                            =  " + str(self.Oc0 + self.Ob0 + self.On0) +"\n"
+		s += "should be the same as \Omega_m =  " + str(self.Om0)  + "\n"
+		s += "\Omega_{de}                    =  " + str(self.Ode0) + "\n"
+		s += "\Omega_k                       =  " + str(self.Ok0)  + "\n" 
+		
+		s += "--------------------------------\n"
+		s += "sum of components -1.0         =  " + str(self.Oc0 + self.Ob0 + self.On0 +self.Ode0 + relenergydensity -1.) +"\n"
+		s += "=======================\n" 
+		return s
 
 	def growth(self, z ):
 		""" 
