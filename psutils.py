@@ -307,6 +307,20 @@ def powerspectrum ( koverh ,
 				'log': linearly interpolates 
 				log(koverh) vs log(PS) in units of h^#/Mpc^3
 				'linear' : linearly interpolates koverh and PS
+		pstype      : string, optional, defaults to 'matter'
+			sets the way the perturbations are counted in order 
+			to calculate the matter power spectrum, though the 				perturbations are evolved correctly according to the 
+			cosmological model.
+			OPTIONS:
+			--------
+			'matter': Conventional matter power spectrum, as would 
+				be calculated in CAMB, including the density
+				contrast for CDM, baryon and massive neutrinos
+			'cb'    : Counts only the cDM and baryons in calculating
+				the matter power spectrum.
+			'cbmatter': Counts only the CDM and baryon fluctuations
+				but the entire matter (CDM + baryons + massive
+				neutrinos) for the background density
 	returns:
 		tuple (koverh , power spectrum)
 
@@ -550,6 +564,22 @@ def __powerspectrum ( koverh ,
 
 			return (pk [:,0], pk[:,1])
 
+		if pstype == "cbmatter":
+			Omegam = cosmo.Om0
+			Omegacb = cosmo.Ob0 + cosmo.Oc0 
+			ratiosq = (Omegacb/Omegam)**2.0
+			#print "filename ", asciifile
+			pk = cio.cbpowerspectrum ( transferfile = asciifile , 
+				Omegacdm  =  cosmo.Oc0,
+				Omegab    =  cosmo.Ob0, 
+				h         =  cosmo.h, 
+				Omeganu   =  cosmo.On0,
+				As        =  params["As"], 
+				#As        =  cosmo.As, 
+				ns        =  cosmo.ns, 
+				koverh    =  None )
+
+			return (pk [:,0], pk[:,1]*ratiosq)
 		if pstype == "matter" :
 			if koverh == None :
 				koverh = tmpfile[:,0]
