@@ -647,6 +647,8 @@ def sigmasq (ps , R = 8. , usenative = True, khmin = 0.9e-5 , khmax = 5.0, logkh
 			Use values provided in ps, rather than 
 			interpolation
 		cosmo: Model, whose hubble constant will be used
+		khmin: float, value below which the integral will not be 
+			calculated
 		
 	returns :
 		array of sigmasq values 
@@ -676,6 +678,8 @@ def sigmasq (ps , R = 8. , usenative = True, khmin = 0.9e-5 , khmax = 5.0, logkh
 
 		logkhmin = max(min(ps[0]),logkhmin)
 		logkhmax = min(max(ps[0]),logkhmax) 
+	mask = khvals >= khmin 
+	khvals = khvals[mask]
 
 	k  = khvals * h  
 	
