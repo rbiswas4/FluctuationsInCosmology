@@ -25,6 +25,28 @@ def haccredshiftsforstep(stepnumber ,
 	z = 1.0/aatstep - 1.0 
 
 	return z 
+def forceresolution( numgridptscuberoot, 
+	lengthcuberoot ) :
+	"""	
+	returns the force resolution of the PM part in units of 
+	the input boxsize 
+	args:
+		numgridptscuberoot:
+		lengthcuberoot    : 
+	return :
+		force resolution (distance) in units usef for the 
+		box size
+
+	"""
+
+	return lengthcuberoot/numgridptscuberoot 
+def nyquist (numparticlescuberoot ,
+	lengthcuberoot, # cube root of vol in h^{-1} Mpc
+	):
+
+	ny = np.pi *numparticlescuberoot / lengthcuberoot 
+
+	return ny  
 
 def particlemass(
 	numparticlescuberoot ,
@@ -253,8 +275,9 @@ class haccsim (object ) :
 		s  = "SUMMARY OF simulation, name = "+ self.name  
 		s += "\n\n========================================\n\n"
 		s += "Cosmology\n====================\n" 
-		s += "massive neutrino energy density h^2" + str(self.cosmo.sigmamnu/94.0) + "\n"
-		s += "massive neutrino energy density " + str(self.cosmo.On0) + "\n"
+		s += self.cosmo.summary()
+		#s += "massive neutrino energy density h^2" + str(self.cosmo.sigmamnu/94.0) + "\n"
+		#s += "massive neutrino energy density " + str(self.cosmo.On0) + "\n"
 		s += "Simulation Properties\n=====================\n\n"
 
 		s += "Simulation Volume ("+ "{:.2e}".format(self._boxsize) +r'$)^3 h^{-3} Mpc^3$'+" \n"  

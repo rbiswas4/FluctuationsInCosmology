@@ -13,6 +13,14 @@ def __SP (
 	A = A0 / (1. + z )**alpha
 	return A 
 
+def fsigmaTinker( sigma, 
+   A = 0.186 , 
+   a = 1.47 , 
+   b = 2.57 , 
+   c = 1.19): 
+
+	x =  sigma
+ 	return A*(((x/b)**(-a))+1)*np.exp(-c/x**2)
 def fsigmaMICE(
 	sigma , z ) :
 	"""

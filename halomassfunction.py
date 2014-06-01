@@ -15,7 +15,7 @@ def __dndlnM ( M ,
 	bgtype = "cb", 
 	powerspectrumfile = "LCDM_matterpower.dat" ,
 	cosmo = None, 
-	deltac = 1.674 , 
+	deltac = 1.686 , 
 	fittingform = "Bhattacharya10",
 	**params ):
 	"""
@@ -34,12 +34,10 @@ def __dndlnM ( M ,
 
 	CHANGES:
 		added argument deltac with default value 1.674 
+		changed back to 1.686 R. Biswas 
 	"""
 
 	h = cosmo.H0/100.0
-	#rhocr = critdensity( h = h , 
-	#	unittype = "solarmassperMpc3") 
-
 	
 	sig = psu.sigmaM (M ,  
 		ps , 
@@ -47,9 +45,11 @@ def __dndlnM ( M ,
 		khmin = khmin , 
 		khmax = khmax  ,
 		logkhint = logkhint ,
-		z = 0.,
+		z = z,
 		cosmo = cosmo ,
 		**params)
+
+	sigm = sig
 
 	dlsinvdlM =  -psu.dlnsigmadlnM (M ,
 		ps ,
@@ -63,7 +63,7 @@ def __dndlnM ( M ,
 
 	if fittingform == "Bhattacharya10":
 		f_sigma = mf.__fsigmaBhattacharya (
-		 sigma = sig,
+		 sigma = sigm,
 		 deltac = deltac ,
 		 z = z ,
 		 A0 = 0.333 ,
@@ -77,9 +77,10 @@ def __dndlnM ( M ,
 		 Mlow = 6e11 ,
 		 Mhigh = 3e15)    
 	elif fittingform == "MICE" : 
-		f_sigma = mf.fsigmaMICE(sigma = sig, z  = z)
+		f_sigma = mf.fsigmaMICE(sigma = sigm, z  = z)
 	else: 
 		raise ValueError("This fitting form is not implemented")
+
 
 	rhobg = psu.__rhobg( z =z , bgtype = bgtype, 
 		unittype = "solarmassperMpc3",  cosmo = cosmo)
@@ -132,7 +133,6 @@ def dndlnM0 ( M ,
 	h = cosmo.H0/100.0
 	#rhocr = critdensity( h = h , 
 	#	unittype = "solarmassperMpc3") 
-
 	
 	sig = psu.sigmaM (M ,  
 		ps , 
@@ -145,6 +145,7 @@ def dndlnM0 ( M ,
 		**params)
 
 	sigm = cosmo.growth(z=z)[0]*sig
+	#print sigm
 
 	dlsinvdlM =  -psu.dlnsigmadlnM (M ,
 		ps ,
