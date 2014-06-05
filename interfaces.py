@@ -130,31 +130,51 @@ class FCPL (w0waCDM) :
 	def summary(self ) :
 		h = self.h
 
-		s  = "********************************\n"
-		s += "==========Cosmology=============\n" 
+		s  = "******************************************************\n"
+		s += "======================Cosmology=======================\n" 
 		s += " h      = " + str(self.h) +"\n"
-		s += "==========Relativistic===========\n" 
+		s += "================Relativistic Components===============\n" 
 		s += "\Omega_\gamma                  =  " + str(self.Ogamma0)  + "\n" 
-		s += "\Omega_nu_0                   =  " + str(self.Onu0)  + "\n" 
-		s += "--------------------------------\n"
+		s += "\Omega_nu_0                    =  " + str(self.Onu0)  + "\n" 
+		s += "------------------------------------------------------\n"
 		relenergydensity  = self.Ogamma0 + self.Onu0 
 		s += "sum                            =  " + str(relenergydensity)  + "\n"
 
 
-		s += "sum of masses of nu /94.0 = "+ str(self.sigmamnu/94.0) + "\n"
-		s += "sum of masses of nu /94.0/h^2 = "+ str(self.sigmamnu/94.0/h/h) + "\n"
-		s += "\Omega_{nu} (massive)   " + str(self.On0) + "\n"
-		s += "\Omega_{cdm}"+ str(self.Oc0) + "\n"
-		s += "\Omega_{b}"+ str(self.Ob0) + "\n"
-		s += "--------------------------------\n"
+		s += "sum of masses of nu /94.0      = "+ str(self.sigmamnu/94.0) + "\n"
+		s += "sum of masses of nu /94.0/h^2  = "+ str(self.sigmamnu/94.0/h/h) + "\n"
+		s += "\Omega_{nu} (massive)          = " + str(self.On0) + "\n"
+		s += "\Omega_{cdm}                   = "+ str(self.Oc0) + "\n"
+		s += "\Omega_{b}                     = "+ str(self.Ob0) +  "\n"
+		s += "------------------------------------------------------\n"
+		#s += "--------------------------------\n"
 		s += "sum                            =  " + str(self.Oc0 + self.Ob0 + self.On0) +"\n"
 		s += "should be the same as \Omega_m =  " + str(self.Om0)  + "\n"
 		s += "\Omega_{de}                    =  " + str(self.Ode0) + "\n"
 		s += "\Omega_k                       =  " + str(self.Ok0)  + "\n" 
 		
-		s += "--------------------------------\n"
+		s += "------------------------------------------------------\n"
 		s += "sum of components -1.0         =  " + str(self.Oc0 + self.Ob0 + self.On0 +self.Ode0 + relenergydensity -1.) +"\n"
-		s += "=======================\n" 
+		#s += "=======================\n" 
+		s += "=========Primordial Fluctuations =====================\n"
+		if self.ns !=None:
+			s += "\\n_s                           = "  + str(self.ns) \
+				+ "\n" 
+		else:
+			s += "\\n_s                           = "  + \
+				"Not provided \n" 
+		if self.sigma8 !=None:
+			s += "\sigma_8                       = "                 \
+				+ str(self.sigma8) + "\n" 
+		else:
+			s += "\sigma_8                       = "  + \
+				"Not provided \n" 
+		if self.As !=None:
+			s += "A_s                            = "  + str(self.As) \
+				+ "\n" 
+		else:
+			s += "A_s                            = "  + \
+				"Not provided \n" 
 		return s
 
 	def growth(self, z ):

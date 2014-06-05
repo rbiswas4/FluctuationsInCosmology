@@ -622,6 +622,8 @@ def sigma(ps ,  R = 8 ,  khmin = 1e-5, khmax = 2.0, logkhint = 0.005, cosmo = No
 			default is filters.Wtophatkspacesq which is 
 			the Fourier transform of the tophat at R Mpc/h
 		cosmo: cosmological model
+		khmin: float, optional defaults to 1e-5
+			min value of k/h used in evaluating the integral.
 	usage:
 		>>> pk = np.loadtxt("powerspectrum") 
 		>>> sigma (ps = (pk[:,0],pk[:,1]), cosmo = cosmo)
@@ -647,6 +649,8 @@ def sigmasq (ps , R = 8. , usenative = True, khmin = 0.9e-5 , khmax = 5.0, logkh
 			Use values provided in ps, rather than 
 			interpolation
 		cosmo: Model, whose hubble constant will be used
+		khmin: float, value below which the integral will not be 
+			calculated
 		
 	returns :
 		array of sigmasq values 
@@ -676,6 +680,8 @@ def sigmasq (ps , R = 8. , usenative = True, khmin = 0.9e-5 , khmax = 5.0, logkh
 
 		logkhmin = max(min(ps[0]),logkhmin)
 		logkhmax = min(max(ps[0]),logkhmax) 
+	mask = khvals >= khmin 
+	khvals = khvals[mask]
 
 	k  = khvals * h  
 	
@@ -734,6 +740,12 @@ def sigmaM (M ,
 	args:
 		M: array like , mandatory
 			mass of halo in units of solar masses
+		ps: 
+		bgtype :
+		z  = : 
+		khmin :
+		cosmo :
+		
 		
 	notes:
 		the bgtype matters for converting Mass M to R.
@@ -753,8 +765,8 @@ def sigmaM (M ,
 	RinMpcoverh = R*h 
 
 	
-	print "RinMpcoverh ***************"
-	print RinMpcoverh 
+	#print "RinMpcoverh ***************"
+	#print RinMpcoverh 
 	#return RinMpcoverh 	
 	return sigma( ps , R = RinMpcoverh, khmin = khmin , khmax = khmax, logkhint = logkhint , cosmo= cosmo, **params) 
 
@@ -762,12 +774,12 @@ def sigmaM (M ,
 		
 def dlnsigmadlnM (M ,
 	ps ,
-	z = 0.0 , 
 	bgtype = "matter", 
 	cosmo = None , 
 	khmin  = 1.0e-5 ,
 	khmax  = 2.0 ,
 	logkhint = 0.005 , 
+	z = 0.0 , 
 	**params ) :	
 	"""
 	returns the derivative dln (\sigma^{-1})/ d ln M at values of M by
@@ -777,6 +789,8 @@ def dlnsigmadlnM (M ,
 			mass of halo in units of solar mass
 		ps : tuple, mandatory
 			(koverh , ps)
+		z  : Redshift. SHOULD ALWAYS BE SET TO 0. left for historical
+			reasons.
 
 	notes:
 		dln(\sigma^{-1})/dln M = M /sigma^{-1}* (-1.)\sigma^{-2}* d sigma /dR dR/dM 
@@ -794,7 +808,7 @@ def dlnsigmadlnM (M ,
 		**params)
 
 	h = cosmo.h
-	R =  filterradiusformass( M  , bgtype = bgtype, z = z, cosmo = cosmo)
+	R =  filterradiusformass( M  , bgtype = bgtype, z = 0, cosmo = cosmo)
 
 	dlnRdlnM = 1.0/3.0
 	RinMpcoverh = R*h 

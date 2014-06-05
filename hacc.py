@@ -25,6 +25,28 @@ def haccredshiftsforstep(stepnumber ,
 	z = 1.0/aatstep - 1.0 
 
 	return z 
+def forceresolution( numgridptscuberoot, 
+	lengthcuberoot ) :
+	"""	
+	returns the force resolution of the PM part in units of 
+	the input boxsize 
+	args:
+		numgridptscuberoot:
+		lengthcuberoot    : 
+	return :
+		force resolution (distance) in units usef for the 
+		box size
+
+	"""
+
+	return lengthcuberoot/numgridptscuberoot 
+def nyquist (numparticlescuberoot ,
+	lengthcuberoot, # cube root of vol in h^{-1} Mpc
+	):
+
+	ny = np.pi *numparticlescuberoot / lengthcuberoot 
+
+	return ny  
 
 def particlemass(
 	numparticlescuberoot ,
