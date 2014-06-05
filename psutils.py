@@ -774,12 +774,12 @@ def sigmaM (M ,
 		
 def dlnsigmadlnM (M ,
 	ps ,
-	z = 0.0 , 
 	bgtype = "matter", 
 	cosmo = None , 
 	khmin  = 1.0e-5 ,
 	khmax  = 2.0 ,
 	logkhint = 0.005 , 
+	z = 0.0 , 
 	**params ) :	
 	"""
 	returns the derivative dln (\sigma^{-1})/ d ln M at values of M by
