@@ -90,7 +90,8 @@ def __fsigmaBhattacharya (
 	Mlow = 6e11 , 
 	Mhigh = 3e15) :
 
-	"""Produces the fit from Bhattacharya etal. in Table 4 of 
+	"""
+	Produces the fit from Bhattacharya etal. in Table 4 of 
 	http://arxiv.org/pdf/1005.2239.pdf
 
 
