@@ -671,7 +671,9 @@ def sigmasq (ps , R = 8. , usenative = True, khmin = 0.9e-5 , khmax = 5.0, logkh
 
 	h = cosmo.H0/100.0
 	if usenative :
-		khvals = ps[0]
+		mask = ps[1] is not np.nan
+		khvals = ps[0][mask]
+		khvals = ps[0][mask]
 	else: 
 		logkhmin  = np.log(khmin)
 		logkhmax  = np.log(khmax)
