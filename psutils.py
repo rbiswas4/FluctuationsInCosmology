@@ -380,7 +380,7 @@ def powerspectrum ( koverh ,
 		
 	#print "VALUES passed on from powerspectrum routine \n"		
 	if verbose:
-		print "sigma8 = ", sigma8, " As ", As
+		print "sigma8 = ", sigma8, " As ", cosmo.As
 	#print paramdict["As"], "IN powerspectrum"
 
 	pstmp  = __powerspectrum ( koverh = None, 
@@ -672,8 +672,8 @@ def sigmasq (ps , R = 8. , usenative = True, khmin = 0.9e-5 , khmax = 5.0, logkh
 	h = cosmo.H0/100.0
 	if usenative :
 		mask = ps[1] is not np.nan
-		khvals = ps[0][mask]
-		khvals = ps[0][mask]
+		#khvals = ps[0][mask]
+		khvals = ps[0]
 	else: 
 		logkhmin  = np.log(khmin)
 		logkhmax  = np.log(khmax)
@@ -711,6 +711,33 @@ def sigmasq (ps , R = 8. , usenative = True, khmin = 0.9e-5 , khmax = 5.0, logkh
 	return sigmasq	
 
 
+def getcosmo(cosmo, cambtf_file, sigma8 = None) :
+
+	"""
+	returns an FCPL object with the same cosmology as cosmo, except 
+	that the amplitude is a CMB normalized As, such that the cambtf_file 
+	produces the input sigma8, or the cosmo.sigma8
+
+	args:
+	
+	returns:
+		cosmo with the amplitude set correctly so that 
+		the sigma8 values match
+
+
+	"""
+	Acosmo = cosmo 
+	sig8 = sigma8
+	if sig8 is None: 
+		sig8 = cosmo.sigma8
+	Acosmo.setamplitude(As =1.0, sigma8 = None)
+
+	cambtmp = powerspectrum(koverh = None, asciifile = cambtf_file, 
+		cosmo = Acosmo ) 
+	
+	As = getAsrel(cambtmp, sigma8 = sig8,  cosmo = Acosmo)
+	Acosmo.setamplitude ( As = As, sigma8 = None)
+	return Acosmo 
 def getAsrel (ps , sigma8, khmin = 1.0e-5 , khmax = 2.0, logkhint = 0.005 , 
 	cosmo = None, filt= filters.Wtophatkspacesq,  **params) :
 	"""
@@ -723,7 +750,10 @@ def getAsrel (ps , sigma8, khmin = 1.0e-5 , khmax = 2.0, logkhint = 0.005 ,
 	"""
 
 	sigsq = sigmasq (ps , khmin= khmin, khmax =khmax,logkhint =logkhint, cosmo = cosmo, filt = filt , **params)  	
+	#print "sigma8 ", sigma8 
+	#print "sigsq ", sigsq 
 	Asrel = sigma8*sigma8 / sigsq 
+	#print "Asrel in Asre", Asrel
 	return Asrel
  
 

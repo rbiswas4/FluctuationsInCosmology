@@ -85,7 +85,7 @@ def fsigmaMICE(
 #	Mhigh = 3e15)
 def __fsigmaBhattacharya (  
 	sigma ,
-	deltac = 1.674 , 
+	deltac = 1.686 , 
 	z = 0.0 ,
 	A0 = 0.333 , 
 	a0 = 0.788 , 

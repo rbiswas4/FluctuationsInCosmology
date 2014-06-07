@@ -125,7 +125,12 @@ class FCPL (w0waCDM) :
 		return self._ns 
 
 
+	def setamplitude(self, sigma8=None, As=None):
 
+		print sigma8
+		print As
+		self._sigma8 = sigma8
+		self._As = As
 	#new methods:
 	def summary(self ) :
 		h = self.h
