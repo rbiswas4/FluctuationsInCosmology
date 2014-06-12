@@ -32,7 +32,8 @@ def fsigmaMICE(
 	b = 0.3  * (1.0 + z )**(-0.084)
 	c = 1.036 * (1.0 + z) **(-0.024)
 
-	if z > 1.0 :
+	#Bad hack to allow us to plot z = 1.006 slice
+	if z < 1.01 :
 		return np.ones(len(sigma))* np.nan
 
  	return A * ( sigma**(-a) + b ) *np.exp( - c/sigma/sigma )
