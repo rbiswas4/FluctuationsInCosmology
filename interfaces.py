@@ -146,9 +146,12 @@ class FCPL (w0waCDM) :
 		s += "sum                            =  " + str(relenergydensity)  + "\n"
 
 
-		s += "sum of masses of nu /94.0      = "+ str(self.sigmamnu/94.0) + "\n"
+		s += "\omega_{nu} (massive)         = "+ str(self.sigmamnu/94.0) + "\n"
+		s += "sum of masses (eV )            = "+ str(self.sigmamnu) 
 		s += "sum of masses of nu /94.0/h^2  = "+ str(self.sigmamnu/94.0/h/h) + "\n"
-		s += "\Omega_{nu} (massive)          = " + str(self.On0) + "\n"
+		s += "\Omega_{nu} (massive)          = "+ str(self.On0) + "\n"
+		s += "\omega_{cdm}                   = "+ str(h*h*self.Oc0) + "\n"
+		s += "\omega_{b}                     = "+ str(h*h*self.Ob0) +  "\n"
 		s += "\Omega_{cdm}                   = "+ str(self.Oc0) + "\n"
 		s += "\Omega_{b}                     = "+ str(self.Ob0) +  "\n"
 		s += "------------------------------------------------------\n"

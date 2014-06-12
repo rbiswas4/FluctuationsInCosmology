@@ -276,7 +276,6 @@ class haccsim (object ) :
 		s += "\n\n========================================\n\n"
 		s += "Cosmology\n====================\n" 
 		s += self.cosmo.summary()
-		#s += "massive neutrino energy density h^2" + str(self.cosmo.sigmamnu/94.0) + "\n"
 		#s += "massive neutrino energy density " + str(self.cosmo.On0) + "\n"
 		s += "Simulation Properties\n=====================\n\n"
 
