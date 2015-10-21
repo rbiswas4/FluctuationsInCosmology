@@ -2,13 +2,14 @@
 #Requirements:
 #cosmoutils 
 #
-from utils import ioutils as io
+# from utils import ioutils as io
+from basicio import utils as ioutils
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
 
 #example input file for HACC
-haccindat      =  "example_data/indat.params"
+haccindat = "example_data/indat.params"
 #haccdictfile   = io.builddict(haccindat , dictdelim = " " )
 def haccredshiftsforstep(stepnumber ,
 	zin = 200. , 
@@ -141,9 +142,9 @@ def hacccosmologydict(haccinputdict ) :
 	return hacccosmologydict 
 
 def _hacccosmo(inputfile ) :
-		from utils import ioutils as io
+		# from utils import ioutils as io
 
-		haccdict   = io.builddict(inputfile , dictdelim = " " )
+		haccdict   = ioutils.builddict(inputfile , dictdelim = " " )
 
 		#print haccdict
 		#print haccdict['OMEGA_NU']
@@ -189,7 +190,7 @@ class haccsim (object ) :
 			self.name = ""
 		else:
 			self.name = name 
-		haccdict = io.builddict(indatfile , dictdelim = " " )
+		haccdict = ioutils.builddict(indatfile , dictdelim = " " )
 
 		#set cosmo:
 		from interfaces import FCPL 
